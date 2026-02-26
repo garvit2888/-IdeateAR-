@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload 3D Model - IdeateAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #F05545;
+            --primary-hover: #E63E3E;
+            --bg-color: #FAFAFA;
+            --text-color: #2D2D2D;
+            --border-color: #E1E1E1;
+            --shadow-color: rgba(240, 85, 69, 0.1);
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .logo {
+            margin-bottom: 2rem;
+            width: 200px;
+            height: auto;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px var(--shadow-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .upload-container {
+            margin: 2rem 0;
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: var(--bg-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary-color);
+            background: var(--card-bg);
+            transform: translateY(-2px);
+        }
+
+        .upload-box.drag-over {
+            border-color: var(--primary-color);
+            background: rgba(240, 85, 69, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.25rem;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-box h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .upload-text {
+            margin: 1rem 0;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .file-preview {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--bg-color);
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .file-preview.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .file-name {
+            font-size: 1rem;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 0.9rem;
+            background: var(--bg-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .submit-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1.25rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .format-info {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #666;
+            padding: 1rem;
+            background: var(--bg-color);
+            border-radius: 12px;
+            line-height: 1.8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-color);
+            border-radius: 6px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .upload-box {
+                padding: 1.5rem;
+            }
+
+            .logo {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="/logo.png" alt="IdeateAR" class="logo">
+    <div class="container">
+        <div class="header">
+            <h1>Upload 3D Model</h1>
+            <p>Transform your menu items into immersive AR experiences with high-quality 3D models</p>
+        </div>
+
+        <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="upload-container">
+                <!-- GLB Upload -->
+                <div class="upload-box" id="glbUploadBox">
+                    <div class="upload-icon">📤</div>
+                    <h3>Upload GLB File</h3>
+                    <p class="upload-text">Drag and drop your GLB file here or click to browse</p>
+                    <input type="file" name="glb" accept=".glb" class="file-input" id="glbInput">
+                    <div class="file-preview" id="glbPreview">
+                        <div class="file-info">
+                            <span class="file-name" id="glbFileName"></span>
+                            <span class="file-size" id="glbFileSize"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USDZ Upload -->
+                <div class="upload-box" id="usdzUploadBox">
+                    <div class="upload-icon">📤</div>
+                    <h3>Upload USDZ File</h3>
+                    <p class="upload-text">Drag and drop your USDZ file here or click to browse</p>
+                    <input type="file" name="usdz" accept=".usdz" class="file-input" id="usdzInput">
+                    <div class="file-preview" id="usdzPreview">
+                        <div class="file-info">
+                            <span class="file-name" id="usdzFileName"></span>
+                            <span class="file-size" id="usdzFileSize"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>Upload Models</button>
+        </form>
+
+        <p class="format-info">
+            Supported formats: .GLB (3D models) and .USDZ (iOS AR Quick Look)<br>
+            Maximum file size: 50MB per file
+        </p>
+    </div>
+
+    <script>
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function handleFile(file, previewId, fileNameId, fileSizeId) {
+            const preview = document.getElementById(previewId);
+            const fileName = document.getElementById(fileNameId);
+            const fileSize = document.getElementById(fileSizeId);
+
+            if (file) {
+                preview.classList.add('active');
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+            } else {
+                preview.classList.remove('active');
+                fileName.textContent = '';
+                fileSize.textContent = '';
+            }
+            updateSubmitButton();
+        }
+
+        function updateSubmitButton() {
+            const glbFile = document.getElementById('glbInput').files[0];
+            const usdzFile = document.getElementById('usdzInput').files[0];
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = !(glbFile || usdzFile);
+        }
+
+        ['glbUploadBox', 'usdzUploadBox'].forEach(boxId => {
+            const box = document.getElementById(boxId);
+            
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.classList.add('drag-over');
+            });
+
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('drag-over');
+            });
+
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.classList.remove('drag-over');
+                const input = box.querySelector('.file-input');
+                const file = e.dataTransfer.files[0];
+                
+                if (file && file.name.endsWith(input.accept)) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files;
+                    handleFile(file, 
+                        boxId === 'glbUploadBox' ? 'glbPreview' : 'usdzPreview',
+                        boxId === 'glbUploadBox' ? 'glbFileName' : 'usdzFileName',
+                        boxId === 'glbUploadBox' ? 'glbFileSize' : 'usdzFileSize'
+                    );
+                }
+            });
+        });
+
+        document.getElementById('glbInput').addEventListener('change', (e) => {
+            handleFile(e.target.files[0], 'glbPreview', 'glbFileName', 'glbFileSize');
+        });
+
+        document.getElementById('usdzInput').addEventListener('change', (e) => {
+            handleFile(e.target.files[0], 'usdzPreview', 'usdzFileName', 'usdzFileSize');
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const progressBar = document.getElementById('progressBar');
+            const progress = document.getElementById('progress');
+            const submitBtn = document.getElementById('submitBtn');
+
+            progressBar.classList.add('active');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            const formData = new FormData(e.target);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.body.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.textContent = 'Upload Failed';
+                submitBtn.disabled = false;
+            });
+
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 90) clearInterval(interval);
+                width += 5;
+                progress.style.width = width + '%';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

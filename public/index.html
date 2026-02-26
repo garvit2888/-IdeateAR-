@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdeateAR - Modern AR Experience</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="/style.css">
+    <!-- Model Viewer for AR/3D -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+</head>
+
+<body>
+    <div class="cursor-glow" id="cursor-glow"></div>
+
+    <!-- Aurora Background Animation -->
+    <div class="aurora-bg">
+        <div class="aurora-blob aurora-1"></div>
+        <div class="aurora-blob aurora-2"></div>
+        <div class="aurora-blob aurora-3"></div>
+    </div>
+
+
+
+    <main class="hero">
+        <div class="hero-content">
+            <h1 class="impactful-heading"><span class="text-white">IDEATE</span>AR</h1>
+            <p class="hero-subtitle">Experience augmented reality in its purest form. Modern, minimalist, and undeniably
+                bold.</p>
+        </div>
+
+        <div class="hero-split-layout">
+            <div class="squircle-container floating-animation">
+                <!-- 
+                INSTRUCTIONS FOR PIZZA.USDZ:
+                The .usdz format is strictly for iOS AR preview. 
+                For the 3D model to be visible on desktop browsers (Chrome, Edge, Safari on Mac) 
+                or Android devices, you MUST also provide a .glb version.
+                -->
+                <model-viewer class="pizza-model" src="pizza.glb" ios-src="pizza.usdz" alt="A 3D model of a pizza"
+                    auto-rotate rotation-per-second="30deg" camera-controls camera-orbit="0deg 45deg 105%" ar
+                    shadow-intensity="1">
+                    <div class="prompt-text" slot="poster">Interact with the 3D model</div>
+                </model-viewer>
+            </div>
+
+            <div class="hero-actions">
+                <a href="#experience" class="experience-btn">EXPERIENCE</a>
+            </div>
+        </div>
+
+        <!-- Discreet Admin Access -->
+        <a href="/upload.html" class="admin-link">Admin Access</a>
+    </main>
+
+    <script>
+        // Cursor glow effect
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        // Only activate on desktop devices
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', (e) => {
+                cursorGlow.style.left = e.clientX + 'px';
+                cursorGlow.style.top = e.clientY + 'px';
+
+                // Show glow if it was hidden
+                if (cursorGlow.style.opacity === '0' || cursorGlow.style.opacity === '') {
+                    cursorGlow.style.opacity = '1';
+                }
+            });
+
+            document.addEventListener('mouseleave', () => {
+                cursorGlow.style.opacity = '0';
+            });
+        }
+    </script>
+</body>
+
+</html>

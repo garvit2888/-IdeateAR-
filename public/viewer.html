@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>IdeateAR - View Dish in AR</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #F05545;
+            --primary-hover: #E63E3E;
+            --bg-color: #1A1A1A;
+            --text-color: #FFFFFF;
+            --card-bg: #2D2D2D;
+            --shadow-color: rgba(240, 85, 69, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-color);
+        }
+
+        #arButton {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 1.25rem 3rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--primary-color);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        #arButton:hover {
+            background: var(--primary-hover);
+            transform: translate(-50%, -52%);
+            box-shadow: 0 6px 25px var(--shadow-color);
+        }
+
+        #arButton:active {
+            transform: translate(-50%, -48%);
+        }
+
+        .ar-icon {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        .loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(240, 85, 69, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(45, 45, 45, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 90;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .instructions.visible {
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Progress bar for model loading */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(240, 85, 69, 0.2);
+            z-index: 1000;
+        }
+
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-color);
+            transition: width 0.2s ease;
+        }
+
+        @media (max-width: 768px) {
+            #arButton {
+                padding: 1rem 2.5rem;
+                font-size: 1.2rem;
+            }
+
+            .ar-icon {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress" id="progressBar"></div>
+    </div>
+
+    <!-- For iOS devices -->
+    <a id="arLink" rel="ar" href="" style="display: none;">
+        <img src="" style="display: none;">
+    </a>
+
+    <!-- Hidden model-viewer for Android AR -->
+    <model-viewer
+        id="modelViewer"
+        ar
+        ar-modes="scene-viewer quick-look webxr"
+        camera-controls
+        auto-rotate
+        rotation-per-second="30deg"
+        exposure="1"
+        shadow-intensity="1"
+        shadow-softness="1"
+        environment-image="neutral"
+        camera-orbit="0deg 75deg 2m"
+        min-camera-orbit="auto auto auto"
+        max-camera-orbit="auto auto 2m"
+        interaction-prompt="none"
+        style="display: none;"
+    ></model-viewer>
+
+    <button id="arButton" style="display: none">
+        <svg class="ar-icon" viewBox="0 0 24 24">
+            <path d="M3 4h18v12H3V4m1 1v10h16V5H4m7 12v2H4v-2h7m9 0v2h-3v-2h3M6 7h2v2H6V7m3 0h2v2H9V7m3 0h2v2h-2V7m3 0h2v2h-2V7M6 10h2v2H6v-2m3 0h2v2H9v-2m3 0h2v2h-2v-2m3 0h2v2h-2v-2M6 13h2v2H6v-2m3 0h2v2H9v-2m3 0h2v2h-2v-2m3 0h2v2h-2v-2"/>
+        </svg>
+        View in AR
+    </button>
+
+    <div class="loading-container" id="loadingContainer">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading AR Experience...</div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const glb = params.get('glb');
+        const usdz = params.get('usdz');
+        const modelViewer = document.getElementById('modelViewer');
+        const arButton = document.getElementById('arButton');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const progressBar = document.getElementById('progressBar');
+        const arLink = document.getElementById('arLink');
+
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+
+        function isAndroid() {
+            return /Android/.test(navigator.userAgent);
+        }
+
+        // Hide loading immediately since we're not showing the model
+        loadingContainer.style.display = 'none';
+        progressBar.style.display = 'none';
+
+        // Set up AR experience based on device
+        if (isIOS()) {
+            if (usdz && usdz !== 'null') {
+                arLink.href = usdz;
+                arButton.style.display = 'flex';
+                arButton.onclick = (e) => {
+                    e.preventDefault();
+                    arLink.click();
+                };
+            }
+        } else if (isAndroid()) {
+            if (glb && glb !== 'null') {
+                // Set up model-viewer but keep it hidden
+                modelViewer.src = glb;
+                arButton.style.display = 'flex';
+                arButton.onclick = () => {
+                    // Show brief loading state
+                    loadingContainer.style.display = 'flex';
+                    
+                    // Attempt to activate AR
+                    try {
+                        modelViewer.activateAR();
+                    } catch (error) {
+                        loadingContainer.innerHTML = `
+                            <div style="text-align: center; padding: 2rem;">
+                                <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Unable to Launch AR</h2>
+                                <p style="color: var(--text-color);">Please ensure AR is supported on your device.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Hide loading after a short delay
+                    setTimeout(() => {
+                        loadingContainer.style.display = 'none';
+                    }, 2000);
+                };
+            }
+        } else {
+            // Desktop experience - show a message
+            arButton.style.display = 'flex';
+            arButton.textContent = 'View on Mobile for AR';
+            arButton.style.opacity = '0.7';
+            arButton.style.cursor = 'not-allowed';
+            arButton.disabled = true;
+        }
+
+        // Handle model viewer errors
+        modelViewer.addEventListener('error', () => {
+            loadingContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Unable to Load AR</h2>
+                    <p style="color: var(--text-color);">Please try again or check device compatibility.</p>
+                </div>
+            `;
+            loadingContainer.style.display = 'flex';
+        });
+
+        // Handle AR mode change
+        modelViewer.addEventListener('ar-status', (event) => {
+            if (event.detail.status === 'failed') {
+                loadingContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <h2 style="color: var(--primary-color); margin-bottom: 1rem;">AR Launch Failed</h2>
+                        <p style="color: var(--text-color);">Please ensure AR is supported on your device.</p>
+                    </div>
+                `;
+                loadingContainer.style.display = 'flex';
+            }
+        });
+    </script>
+</body>
+</html>
