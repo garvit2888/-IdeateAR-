@@ -127,7 +127,6 @@ h6,
 /* Experience Button */
 .experience-btn {
     display: inline-block;
-    margin-top: 3rem;
     padding: 1.5rem 4rem;
     background: #1a1a1a;
     color: var(--text-white);
