@@ -16,6 +16,8 @@ body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
+    padding: 30px;
+    /* space for marquees */
     position: relative;
     cursor: default;
 }
@@ -174,8 +176,8 @@ h6,
 /* Admin Link */
 .admin-link {
     position: absolute;
-    bottom: 2rem;
-    right: 2rem;
+    bottom: calc(2rem + 30px);
+    right: calc(2rem + 30px);
     color: rgba(255, 255, 255, 0.3);
     text-decoration: none;
     font-size: 0.8rem;
@@ -189,7 +191,7 @@ h6,
 
 /* Main Content */
 .hero {
-    min-height: 100vh;
+    min-height: calc(100vh - 60px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -316,3 +318,81 @@ h6,
 }
 
 /* Show prompt briefly on load using animation if desired, or hidden until model loaded */
+
+/* Marquee Borders */
+.marquee-border {
+    position: fixed;
+    background-color: var(--text-black);
+    color: var(--text-white);
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    z-index: 1000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+}
+
+.marquee-border .marquee-track {
+    display: flex;
+    white-space: nowrap;
+}
+
+.marquee-border .marquee-text {
+    padding: 0 1rem;
+}
+
+/* Horizontal marquees */
+.marquee-top {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 30px;
+}
+
+.marquee-bottom {
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 30px;
+}
+
+.marquee-top .marquee-track,
+.marquee-bottom .marquee-track {
+    animation: marquee-horizontal 20s linear infinite;
+}
+
+@keyframes marquee-horizontal {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Vertical marquees */
+.marquee-left {
+    top: 100vh;
+    left: 0;
+    width: 100vh;
+    height: 30px;
+    transform-origin: top left;
+    transform: rotate(-90deg);
+}
+
+.marquee-right {
+    top: 0;
+    left: 100vw;
+    width: 100vh;
+    height: 30px;
+    transform-origin: top left;
+    transform: rotate(90deg);
+}
+
+.marquee-left .marquee-track,
+.marquee-right .marquee-track {
+    animation: marquee-horizontal 20s linear infinite;
+}
