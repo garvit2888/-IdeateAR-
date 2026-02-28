@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IdeateAR - Modern AR Experience</title>
@@ -8,89 +9,74 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800;900&display=swap"
-      rel="stylesheet"
-    />
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800;900&display=swap"
+        rel="stylesheet" />
     <!-- Styles -->
-    <link rel="stylesheet" href="/public/style.css" />
+    <link rel="stylesheet" href="./style.css" />
     <!-- Model Viewer for AR/3D -->
-    <script
-      type="module"
-      src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"
-    ></script>
-  </head>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+</head>
 
-  <body>
+<body>
     <div class="cursor-glow" id="cursor-glow"></div>
 
     <!-- Aurora Background Animation -->
     <div class="aurora-bg">
-      <div class="aurora-blob aurora-1"></div>
-      <div class="aurora-blob aurora-2"></div>
-      <div class="aurora-blob aurora-3"></div>
+        <div class="aurora-blob aurora-1"></div>
+        <div class="aurora-blob aurora-2"></div>
+        <div class="aurora-blob aurora-3"></div>
     </div>
 
     <!-- Marquee Borders -->
     <div class="marquee-border marquee-top">
-      <div class="marquee-track">
-        <span class="marquee-text"
-          >We are onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
-          &nbsp;&bull;&nbsp; We are onboarding now! &nbsp;&bull;&nbsp; We are
-          onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
-          &nbsp;&bull;&nbsp;
-        </span>
-        <span class="marquee-text"
-          >We are onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
-          &nbsp;&bull;&nbsp; We are onboarding now! &nbsp;&bull;&nbsp; We are
-          onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
-          &nbsp;&bull;&nbsp;
-        </span>
-      </div>
+        <div class="marquee-track">
+            <span class="marquee-text">We are onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
+                &nbsp;&bull;&nbsp; We are onboarding now! &nbsp;&bull;&nbsp; We are
+                onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
+                &nbsp;&bull;&nbsp;
+            </span>
+            <span class="marquee-text">We are onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
+                &nbsp;&bull;&nbsp; We are onboarding now! &nbsp;&bull;&nbsp; We are
+                onboarding now! &nbsp;&bull;&nbsp; We are onboarding now!
+                &nbsp;&bull;&nbsp;
+            </span>
+        </div>
     </div>
 
     <main class="hero">
-      <div class="hero-content">
-        <h1 class="impactful-heading">
-          <span class="text-white">IDEATE</span>AR
-        </h1>
-        <p class="hero-subtitle">
-          Modern Augmented Reality menu for restaurants
-        </p>
-      </div>
+        <div class="hero-content">
+            <h1 class="impactful-heading">
+                <span class="text-white">IDEATE</span>AR
+            </h1>
+            <p class="hero-subtitle">
+                Modern Augmented Reality menu for restaurants
+            </p>
+        </div>
 
-      <div class="hero-split-layout">
-        <div class="squircle-container floating-animation">
-          <!-- 
+        <div class="hero-split-layout">
+            <div class="squircle-container floating-animation">
+                <!-- 
                 INSTRUCTIONS FOR PIZZA.USDZ:
                 The .usdz format is strictly for iOS AR preview. 
                 For the 3D model to be visible on desktop browsers (Chrome, Edge, Safari on Mac) 
                 or Android devices, you MUST also provide a .glb version.
                 -->
-          <model-viewer
-            class="pizza-model"
-            src="/public/pizza.glb"
-            ios-src="/public/pizza.usdz"
-            alt="A 3D model of a pizza"
-            auto-rotate
-            rotation-per-second="30deg"
-            camera-controls
-            camera-orbit="0deg 45deg 105%"
-            ar
-            shadow-intensity="1"
-          >
-            <div class="prompt-text" slot="poster">
-              Interact with the 3D model
+                <model-viewer class="pizza-model" src="./pizza.glb" ios-src="./pizza.usdz" alt="A 3D model of a pizza"
+                    auto-rotate rotation-per-second="30deg" camera-controls camera-orbit="0deg 45deg 105%" ar
+                    shadow-intensity="1">
+                    <div class="prompt-text" slot="poster">
+                        Interact with the 3D model
+                    </div>
+                </model-viewer>
             </div>
-          </model-viewer>
+
+            <div class="hero-actions">
+                <a href="#experience" class="experience-btn">EXPLORE NOW</a>
+            </div>
         </div>
 
-        <div class="hero-actions">
-          <a href="#experience" class="experience-btn">EXPLORE NOW</a>
-        </div>
-      </div>
-
-      <!-- Discreet Admin Access -->
-      <a href="/upload.html" class="admin-link">Admin Access</a>
+        <!-- Discreet Admin Access -->
+        <a href="/upload.html" class="admin-link">Admin Access</a>
     </main>
 
     <!-- Overlay for Warp Transition -->
@@ -98,34 +84,26 @@
 
     <!-- Explore Section (What we do & Integration Process) -->
     <section class="explore-section" id="explore-section">
-      <div class="explore-content">
-        <div
-          class="what-we-do-split"
-          style="
+        <div class="explore-content">
+            <div class="what-we-do-split" style="
             display: flex;
             gap: 4rem;
             align-items: stretch;
             margin-bottom: 6rem;
             flex-wrap: wrap;
-          "
-        >
-          <div
-            class="what-we-do-container fade-in-up"
-            style="flex: 1; min-width: 300px"
-          >
-            <h2 class="section-title">What We Do.</h2>
-            <p class="section-description">
-              IdeateAR's AR Menu leverages cutting-edge augmented reality to
-              create interactive, visually appealing menus accessible via
-              smartphones. This technology allows customers to view dishes in
-              3D, ensuring better decision-making.
-            </p>
-          </div>
+          ">
+                <div class="what-we-do-container fade-in-up" style="flex: 1; min-width: 300px">
+                    <h2 class="section-title">What We Do.</h2>
+                    <p class="section-description">
+                        IdeateAR's AR Menu leverages cutting-edge augmented reality to
+                        create interactive, visually appealing menus accessible via
+                        smartphones. This technology allows customers to view dishes in
+                        3D, ensuring better decision-making.
+                    </p>
+                </div>
 
-          <!-- New Right Side Animated Squircle -->
-          <div
-            class="squircle-container benefits-squircle fade-in-up floating-animation"
-            style="
+                <!-- New Right Side Animated Squircle -->
+                <div class="squircle-container benefits-squircle fade-in-up floating-animation" style="
               flex: 1;
               min-width: 300px;
               display: flex;
@@ -133,140 +111,131 @@
               justify-content: center;
               position: relative;
               animation-delay: 0.2s;
-            "
-          >
-            <div class="sliding-text-wrapper">
-              <ul class="sliding-text-list" id="sliding-text-list">
-                <li>Stand Out From Competitors</li>
-                <li>Eliminate Customer Disappointment</li>
-                <li>Increase Average Order Value</li>
-                <li>Better Experience = Better Reviews</li>
-                <li>Future-Proof Your Restaurant</li>
-                <li>Boost Customer Engagement</li>
-                <!-- First item repeated to create a seamless loop effect -->
-                <li>Stand Out From Competitors</li>
-              </ul>
+            ">
+                    <div class="sliding-text-wrapper">
+                        <ul class="sliding-text-list" id="sliding-text-list">
+                            <li>Stand Out From Competitors</li>
+                            <li>Eliminate Customer Disappointment</li>
+                            <li>Increase Average Order Value</li>
+                            <li>Better Experience = Better Reviews</li>
+                            <li>Future-Proof Your Restaurant</li>
+                            <li>Boost Customer Engagement</li>
+                            <!-- First item repeated to create a seamless loop effect -->
+                            <li>Stand Out From Competitors</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div
-          class="integration-container fade-in-up"
-          style="animation-delay: 0.2s"
-        >
-          <h2 class="section-title">5-Step Integration.</h2>
-          <div class="steps-grid">
-            <div class="step-card">
-              <div class="step-number">01</div>
-              <h3>Onboarding</h3>
-              <p>
-                Understanding your menu and brand identity to tailor the AR
-                experience.
-              </p>
-            </div>
-            <div class="step-card">
-              <div class="step-number">02</div>
-              <h3>Photography</h3>
-              <p>
-                Professional photography of your dishes from optimal angles.
-              </p>
-            </div>
-            <div class="step-card">
-              <div class="step-number">03</div>
-              <h3>3D Modeling</h3>
-              <p>Crafting photorealistic 3D models for true-to-life visuals.</p>
-            </div>
-            <div class="step-card">
-              <div class="step-number">04</div>
-              <h3>Cloud Hosting</h3>
-              <p>
-                Secure cloud hosting mapped with uniquely generated QR codes.
-              </p>
-            </div>
-            <div class="step-card">
-              <div class="step-number">05</div>
-              <h3>Go Live</h3>
-              <p>
-                Menu integration and staff training for a seamless launch in
-                just over a month.
-              </p>
-            </div>
-          </div>
+            <div class="integration-container fade-in-up" style="animation-delay: 0.2s">
+                <h2 class="section-title">5-Step Integration.</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">01</div>
+                        <h3>Onboarding</h3>
+                        <p>
+                            Understanding your menu and brand identity to tailor the AR
+                            experience.
+                        </p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">02</div>
+                        <h3>Photography</h3>
+                        <p>
+                            Professional photography of your dishes from optimal angles.
+                        </p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">03</div>
+                        <h3>3D Modeling</h3>
+                        <p>Crafting photorealistic 3D models for true-to-life visuals.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">04</div>
+                        <h3>Cloud Hosting</h3>
+                        <p>
+                            Secure cloud hosting mapped with uniquely generated QR codes.
+                        </p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">05</div>
+                        <h3>Go Live</h3>
+                        <p>
+                            Menu integration and staff training for a seamless launch in
+                            just over a month.
+                        </p>
+                    </div>
+                </div>
 
-          <!-- Contact Us Button -->
-          <div
-            class="action-wrapper fade-in-up"
-            style="
+                <!-- Contact Us Button -->
+                <div class="action-wrapper fade-in-up" style="
               display: flex;
               justify-content: center;
               margin-top: 5rem;
               animation-delay: 0.4s;
-            "
-          >
-            <button
-              class="interested-btn"
-              style="padding: 1.5rem 5rem; font-size: 1.5rem; font-weight: 900"
-            >
-              CONTACT US
-            </button>
-          </div>
+            ">
+                    <button class="interested-btn" style="padding: 1.5rem 5rem; font-size: 1.5rem; font-weight: 900">
+                        CONTACT US
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
     </section>
 
     <script>
-      // Cursor glow effect
-      const cursorGlow = document.getElementById("cursor-glow");
+        // Cursor glow effect
+        const cursorGlow = document.getElementById("cursor-glow");
 
-      // Only activate on desktop devices
-      if (window.matchMedia("(pointer: fine)").matches) {
-        document.addEventListener("mousemove", (e) => {
-          cursorGlow.style.left = e.clientX + "px";
-          cursorGlow.style.top = e.clientY + "px";
+        // Only activate on desktop devices
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener("mousemove", (e) => {
+                cursorGlow.style.left = e.clientX + "px";
+                cursorGlow.style.top = e.clientY + "px";
 
-          // Show glow if it was hidden
-          if (
-            cursorGlow.style.opacity === "0" ||
-            cursorGlow.style.opacity === ""
-          ) {
-            cursorGlow.style.opacity = "1";
-          }
+                // Show glow if it was hidden
+                if (
+                    cursorGlow.style.opacity === "0" ||
+                    cursorGlow.style.opacity === ""
+                ) {
+                    cursorGlow.style.opacity = "1";
+                }
+            });
+
+            document.addEventListener("mouseleave", () => {
+                cursorGlow.style.opacity = "0";
+            });
+        }
+
+        // Warp Transition Logic
+        const exploreBtn = document.querySelector(".experience-btn");
+        const overlay = document.getElementById("warp-overlay");
+        const exploreSection = document.getElementById("explore-section");
+
+        exploreBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            // Trigger warp effect
+            overlay.classList.add("active");
+
+            // Wait for overlay to fill the screen, then show content and scroll
+            setTimeout(() => {
+                exploreSection.classList.add("active");
+                exploreSection.scrollIntoView({ behavior: "auto" });
+
+                // Trigger fade-in animations
+                const animateElements = document.querySelectorAll(".fade-in-up");
+                animateElements.forEach((el) => el.classList.add("visible"));
+
+                // Remove warp effect
+                overlay.classList.remove("active");
+                overlay.classList.add("fade-out");
+
+                setTimeout(() => {
+                    overlay.classList.remove("fade-out");
+                }, 800);
+            }, 800); // Matches the warp animation duration
         });
-
-        document.addEventListener("mouseleave", () => {
-          cursorGlow.style.opacity = "0";
-        });
-      }
-
-      // Warp Transition Logic
-      const exploreBtn = document.querySelector(".experience-btn");
-      const overlay = document.getElementById("warp-overlay");
-      const exploreSection = document.getElementById("explore-section");
-
-      exploreBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-
-        // Trigger warp effect
-        overlay.classList.add("active");
-
-        // Wait for overlay to fill the screen, then show content and scroll
-        setTimeout(() => {
-          exploreSection.classList.add("active");
-          exploreSection.scrollIntoView({ behavior: "auto" });
-
-          // Trigger fade-in animations
-          const animateElements = document.querySelectorAll(".fade-in-up");
-          animateElements.forEach((el) => el.classList.add("visible"));
-
-          // Remove warp effect
-          overlay.classList.remove("active");
-          overlay.classList.add("fade-out");
-
-          setTimeout(() => {
-            overlay.classList.remove("fade-out");
-          }, 800);
-        }, 800); // Matches the warp animation duration
-      });
     </script>
-  </body>
+</body>
+
 </html>
