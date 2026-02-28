@@ -16,8 +16,8 @@ body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
-    padding: 30px;
-    /* space for marquees */
+    padding-top: 30px;
+    /* space for top marquee */
     position: relative;
     cursor: default;
 }
@@ -176,8 +176,8 @@ h6,
 /* Admin Link */
 .admin-link {
     position: absolute;
-    bottom: calc(2rem + 30px);
-    right: calc(2rem + 30px);
+    bottom: 2rem;
+    right: 2rem;
     color: rgba(255, 255, 255, 0.3);
     text-decoration: none;
     font-size: 0.8rem;
@@ -191,7 +191,7 @@ h6,
 
 /* Main Content */
 .hero {
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - 30px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -344,6 +344,7 @@ h6,
 }
 
 /* Horizontal marquees */
+/* Horizontal marquees */
 .marquee-top {
     top: 0;
     left: 0;
@@ -351,15 +352,7 @@ h6,
     height: 30px;
 }
 
-.marquee-bottom {
-    bottom: 0;
-    left: 0;
-    width: 100vw;
-    height: 30px;
-}
-
-.marquee-top .marquee-track,
-.marquee-bottom .marquee-track {
+.marquee-top .marquee-track {
     animation: marquee-horizontal 20s linear infinite;
 }
 
@@ -371,28 +364,4 @@ h6,
     100% {
         transform: translateX(-50%);
     }
-}
-
-/* Vertical marquees */
-.marquee-left {
-    top: 100vh;
-    left: 0;
-    width: 100vh;
-    height: 30px;
-    transform-origin: top left;
-    transform: rotate(-90deg);
-}
-
-.marquee-right {
-    top: 0;
-    left: 100vw;
-    width: 100vh;
-    height: 30px;
-    transform-origin: top left;
-    transform: rotate(90deg);
-}
-
-.marquee-left .marquee-track,
-.marquee-right .marquee-track {
-    animation: marquee-horizontal 20s linear infinite;
 }
