@@ -1067,9 +1067,20 @@
             }, 120);
 
             try {
-                const restaurant = document.getElementById('restaurantSelect').value || 'General Menu';
-                const dishName = document.getElementById('dishName').value.trim() || 
-                                (preparedGlbFile ? preparedGlbFile.name.replace('.glb', '') : 'Dish Model');
+                let restaurant = document.getElementById('restaurantSelect').value || 'General Menu';
+                // If user wrote in new restaurant input without clicking save, auto-save and use it
+                const pendingRest = document.getElementById('newRestInput') ? document.getElementById('newRestInput').value.trim() : '';
+                if (pendingRest) {
+                    restaurant = pendingRest;
+                    addAndSelectRestaurant(pendingRest);
+                }
+
+                let dishName = document.getElementById('dishName').value.trim();
+                if (!dishName) {
+                    if (preparedGlbFile) dishName = preparedGlbFile.name.replace(/\.[^/.]+$/, '');
+                    else if (preparedUsdzFile) dishName = preparedUsdzFile.name.replace(/\.[^/.]+$/, '');
+                    else dishName = 'Dish Model';
+                }
 
                 // Path 1: Direct Cloud Storage (Supabase)
                 if (supabaseClient) {
@@ -1118,7 +1129,7 @@
                         } catch (err) {
                             console.warn('Registration fallback:', err);
                         }
-                        displaySuccess(viewerLink, restaurant, dishName);
+                        displaySuccess(viewerLink, restaurant, dishName, glbUrl, usdzUrl);
                         return;
                     }
                 }
@@ -1158,7 +1169,7 @@
                 alert('Upload issue: ' + (error.message || 'Please check your connection and try again.'));
             }
 
-            function displaySuccess(link, restName, dish) {
+            function displaySuccess(link, restName, dish, glbUrl, usdzUrl) {
                 clearInterval(progressTimer);
                 progress.style.width = '100%';
                 setTimeout(() => {
@@ -1168,10 +1179,28 @@
                 submitBtn.textContent = 'Uploaded Successfully';
                 submitBtn.disabled = true;
 
+                // Cache newly uploaded dish into browser localStorage for instant history sync
+                try {
+                    const localLinks = JSON.parse(localStorage.getItem('ideatear_links') || '[]');
+                    const filtered = localLinks.filter(l => l.viewerLink !== link);
+                    filtered.unshift({
+                        id: Date.now().toString(),
+                        name: dish,
+                        restaurant: restName,
+                        glb: glbUrl || null,
+                        usdz: usdzUrl || null,
+                        viewerLink: link,
+                        createdAt: new Date().toISOString()
+                    });
+                    localStorage.setItem('ideatear_links', JSON.stringify(filtered));
+                    saveStoredRestaurant(restName);
+                } catch (e) {}
+
                 const fullUrl = window.location.origin + link;
                 resultLinkText.textContent = fullUrl;
                 openViewerBtn.href = fullUrl;
                 resultDesc.textContent = `Assigned to ${restName} — Ready for instant mobile AR viewing.`;
+                resultContainer.style.display = 'block';
                 resultContainer.style.display = 'block';
                 resultContainer.scrollIntoView({ behavior: 'smooth' });
             }

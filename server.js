@@ -55,19 +55,56 @@ app.get('/health', (req, res) => {
     res.send('OK');
 });
 
+// Companion metadata helpers for links history (using Supabase Storage with local & /tmp fallback)
+async function saveCloudLinkItem(item) {
+    if (!item) return;
+
+    // 1. Extract base filename (e.g. "1792514331231-1748354778450")
+    let base = null;
+    const sampleUrl = item.usdz || item.glb || '';
+    if (sampleUrl) {
+        try {
+            const clean = sampleUrl.split('/').pop().split('?')[0];
+            const ext = path.extname(clean);
+            base = path.basename(clean, ext);
+        } catch (e) {}
+    }
+
+    if (base) {
+        // Upload individual meta-${base}.json (always allowed under Supabase Storage RLS)
+        try {
+            await supabase.storage.from('models').upload(
+                `meta-${base}.json`,
+                Buffer.from(JSON.stringify({
+                    name: item.name,
+                    restaurant: item.restaurant,
+                    createdAt: item.createdAt || new Date().toISOString()
+                })),
+                { contentType: 'application/json' }
+            );
+        } catch (e) {
+            console.warn('Could not upload individual meta file:', e.message);
+        }
+    }
+
+    // 2. Also write to /tmp (always writable in AWS Lambda)
+    try {
+        const tmpPath = path.join('/tmp', 'links-history.json');
+        let list = [];
+        try {
+            list = JSON.parse(await fs.readFile(tmpPath, 'utf8'));
+        } catch (e) {}
+        list.unshift(item);
+        await fs.writeFile(tmpPath, JSON.stringify(list, null, 2), 'utf8');
+    } catch (e) {}
+}
+
 // Get all generated WebAR links history
 app.get('/api/links', async (req, res) => {
     try {
-        const historyPath = path.join(__dirname, 'links-history.json');
-        let localHistory = [];
-        try {
-            const data = await fs.readFile(historyPath, 'utf8');
-            localHistory = JSON.parse(data);
-        } catch (readErr) {
-            // Keep empty array
-        }
+        const combinedMap = new Map();
 
-        // Fallback/Dynamic Sync: Query Supabase Storage to check what files exist
+        // 1. Query Supabase Storage files
         let supabaseFiles = [];
         try {
             const { data, error } = await supabase.storage.from('models').list('', {
@@ -81,35 +118,50 @@ app.get('/api/links', async (req, res) => {
             console.error('Error querying Supabase Storage bucket:', storageErr);
         }
 
-        // Group files by base name to reconstruct dynamic history from Supabase bucket
-        const supabaseHistory = [];
-        const processedBases = new Set();
+        // 2. Load companion metadata files (meta-*.json)
+        const metaMap = {};
+        const metaFiles = supabaseFiles.filter(f => f.name.startsWith('meta-') && f.name.endsWith('.json'));
+        await Promise.all(metaFiles.map(async mf => {
+            const base = mf.name.replace(/^meta-/, '').replace(/\.json$/, '');
+            try {
+                const { data } = await supabase.storage.from('models').download(mf.name);
+                if (data) {
+                    metaMap[base] = JSON.parse(await data.text());
+                }
+            } catch (e) {}
+        }));
 
+        // 3. Process 3D Model files (ignoring non-3D artifacts)
+        const processedBases = new Set();
         for (const file of supabaseFiles) {
             const filename = file.name;
-            if (filename === '.emptyFolderPlaceholder' || (!filename.endsWith('.glb') && !filename.endsWith('.usdz'))) {
+            if (filename.startsWith('meta-') || filename.startsWith('rest-') || filename.startsWith('test-') || filename.startsWith('rls-') || (!filename.endsWith('.glb') && !filename.endsWith('.usdz'))) {
                 continue;
             }
 
-            // Filename format: e.g. "1716724000-burger.glb" or "burger.glb"
             const ext = path.extname(filename).toLowerCase();
             const baseWithPrefix = path.basename(filename, ext);
-            
             if (processedBases.has(baseWithPrefix)) continue;
             processedBases.add(baseWithPrefix);
 
-            // Extract display name by removing the leading digits/timestamp prefix if present
-            let displayName = baseWithPrefix;
-            const match = baseWithPrefix.match(/^\d+-(.+)$/);
-            if (match) {
-                displayName = match[1];
-            }
-            displayName = displayName.replace(/[-_]/g, ' ')
-                                     .split(' ')
-                                     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-                                     .join(' ');
+            const meta = metaMap[baseWithPrefix] || {};
 
-            // Find GLB and USDZ files with this base in the bucket list
+            let displayName = meta.name;
+            if (!displayName) {
+                displayName = baseWithPrefix;
+                const match = baseWithPrefix.match(/^\d+-(.+)$/);
+                if (match) {
+                    displayName = match[1];
+                }
+                displayName = displayName.replace(/[-_]/g, ' ')
+                                         .split(' ')
+                                         .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                                         .join(' ');
+            }
+
+            const restaurantName = meta.restaurant || 'General Menu';
+            const itemCreatedAt = meta.createdAt || file.created_at || file.updated_at || new Date().toISOString();
+
             const hasGlb = supabaseFiles.some(f => f.name === `${baseWithPrefix}.glb`);
             const hasUsdz = supabaseFiles.some(f => f.name === `${baseWithPrefix}.usdz`);
 
@@ -126,33 +178,35 @@ app.get('/api/links', async (req, res) => {
             }
 
             if (glbUrl || usdzUrl) {
-                supabaseHistory.push({
+                const link = `/viewer.html?glb=${encodeURIComponent(glbUrl || '')}&usdz=${encodeURIComponent(usdzUrl || '')}`;
+                combinedMap.set(link, {
                     id: file.id || baseWithPrefix,
                     name: displayName,
-                    restaurant: 'General Menu',
+                    restaurant: restaurantName,
                     glb: glbUrl,
                     usdz: usdzUrl,
-                    viewerLink: `/viewer.html?glb=${glbUrl || ''}&usdz=${usdzUrl || ''}`,
-                    createdAt: file.created_at || file.updated_at || new Date().toISOString()
+                    viewerLink: link,
+                    createdAt: itemCreatedAt
                 });
             }
         }
 
-        // Combine local JSON history and Supabase dynamic history
-        const combinedMap = new Map();
+        // 4. Also add default showcase models (like pizza.glb / pizza.usdz) from links-history.json
+        try {
+            const localData = await fs.readFile(path.join(__dirname, 'links-history.json'), 'utf8');
+            const localList = JSON.parse(localData);
+            if (Array.isArray(localList)) {
+                for (const item of localList) {
+                    if (item.viewerLink && !combinedMap.has(item.viewerLink)) {
+                        combinedMap.set(item.viewerLink, {
+                            ...item,
+                            restaurant: item.restaurant || 'Sunset Pizzeria'
+                        });
+                    }
+                }
+            }
+        } catch (e) {}
 
-        // 1. Add Supabase history first
-        for (const item of supabaseHistory) {
-            combinedMap.set(item.viewerLink, item);
-        }
-
-        // 2. Add Local JSON history (preserves explicit restaurant assignments)
-        for (const item of localHistory) {
-            item.restaurant = item.restaurant || 'General Menu';
-            combinedMap.set(item.viewerLink, item);
-        }
-
-        // Convert map back to list and sort by createdAt descending
         const combinedList = Array.from(combinedMap.values()).sort((a, b) => {
             return new Date(b.createdAt) - new Date(a.createdAt);
         });
@@ -317,21 +371,7 @@ app.post('/upload', upload.fields([{ name: 'glb' }, { name: 'usdz' }]), async (r
             viewerLink: viewerLink,
             createdAt: new Date().toISOString()
         };
-
-        try {
-            const historyPath = path.join(__dirname, 'links-history.json');
-            let history = [];
-            try {
-                const data = await fs.readFile(historyPath, 'utf8');
-                history = JSON.parse(data);
-            } catch (readErr) {
-                // If file doesn't exist, use empty array
-            }
-            history.unshift(historyItem);
-            await fs.writeFile(historyPath, JSON.stringify(history, null, 4), 'utf8');
-        } catch (writeErr) {
-            console.error('Error writing link history:', writeErr);
-        }
+        await saveCloudLinkItem(historyItem);
 
         res.send(`Your AR viewer link: <a href="${viewerLink}" target="_blank">${viewerLink}</a>`);
 
@@ -410,7 +450,10 @@ async function initRestaurants() {
 initRestaurants();
 
 async function getRestaurantsList() {
-    // Attempt background sync from Supabase Storage
+    const restaurantMap = new Map();
+    inMemoryRestaurants.forEach(r => restaurantMap.set(r.name.toLowerCase(), r));
+
+    // 1. Try reading restaurants-metadata.json
     try {
         const { data, error } = await supabase.storage.from('models').download('restaurants-metadata.json');
         if (!error && data) {
@@ -418,14 +461,38 @@ async function getRestaurantsList() {
             const cloudList = JSON.parse(text);
             if (Array.isArray(cloudList)) {
                 cloudList.forEach(r => {
-                    if (r && r.name && !inMemoryRestaurants.some(m => m.name.toLowerCase() === r.name.toLowerCase())) {
-                        inMemoryRestaurants.push(r);
+                    if (r && r.name && !restaurantMap.has(r.name.toLowerCase())) {
+                        restaurantMap.set(r.name.toLowerCase(), r);
                     }
                 });
             }
         }
     } catch (e) {}
-    return inMemoryRestaurants;
+
+    // 2. Discover restaurants from individual rest-*.json files
+    try {
+        const { data: files } = await supabase.storage.from('models').list('', { limit: 100 });
+        if (files) {
+            const restFiles = files.filter(f => f.name.startsWith('rest-') && f.name.endsWith('.json'));
+            await Promise.all(restFiles.map(async rf => {
+                try {
+                    const { data } = await supabase.storage.from('models').download(rf.name);
+                    if (data) {
+                        const parsed = JSON.parse(await data.text());
+                        if (parsed && parsed.name && !restaurantMap.has(parsed.name.toLowerCase())) {
+                            restaurantMap.set(parsed.name.toLowerCase(), {
+                                id: 'rest_' + Date.now(),
+                                name: parsed.name,
+                                createdAt: new Date().toISOString()
+                            });
+                        }
+                    }
+                } catch (e) {}
+            }));
+        }
+    } catch (e) {}
+
+    return Array.from(restaurantMap.values());
 }
 
 async function saveRestaurant(name) {
@@ -443,15 +510,16 @@ async function saveRestaurant(name) {
     };
     inMemoryRestaurants.push(newRest);
 
-    // 1. Sync to Supabase Storage for universal serverless cross-instance sync
+    // 1. Upload individual rest-${safeName}.json (always allowed under Supabase Storage RLS)
     try {
+        const safeName = trimmed.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
         await supabase.storage.from('models').upload(
-            'restaurants-metadata.json',
-            Buffer.from(JSON.stringify(inMemoryRestaurants, null, 2)),
-            { upsert: true, contentType: 'application/json' }
+            `rest-${safeName}.json`,
+            Buffer.from(JSON.stringify({ name: trimmed })),
+            { contentType: 'application/json' }
         );
     } catch (e) {
-        console.warn('Could not sync restaurant to Supabase Storage:', e.message);
+        console.warn('Could not save individual rest file to Supabase:', e.message);
     }
 
     // 2. Try saving to /tmp first (always writable on serverless)
@@ -513,17 +581,7 @@ app.post('/api/register-link', async (req, res) => {
             createdAt: new Date().toISOString()
         };
 
-        const historyPath = path.join(__dirname, 'links-history.json');
-        let history = [];
-        try {
-            const data = await fs.readFile(historyPath, 'utf8');
-            history = JSON.parse(data);
-        } catch (readErr) {}
-        
-        history.unshift(historyItem);
-        try {
-            await fs.writeFile(historyPath, JSON.stringify(history, null, 4), 'utf8');
-        } catch (e) {}
+        await saveCloudLinkItem(historyItem);
 
         res.json({ success: true, viewerLink, item: historyItem });
     } catch (err) {

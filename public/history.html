@@ -1000,25 +1000,62 @@
             }
         }
 
-        // Fetch links from backend
+        function getLocalLinks() {
+            try {
+                return JSON.parse(localStorage.getItem('ideatear_links') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // Fetch links from backend with local cache fusion
         async function fetchLinks() {
-            loadingView.style.display = 'grid';
-            linksGrid.style.display = 'none';
-            emptyState.classList.remove('active');
+            // Immediately show cached dishes if available for 0ms delay
+            const localDishes = getLocalLinks();
+            if (localDishes.length > 0 && allLinks.length === 0) {
+                allLinks = localDishes;
+                await fetchRestaurants();
+                loadingView.style.display = 'none';
+                renderLinks();
+            } else if (allLinks.length === 0) {
+                loadingView.style.display = 'grid';
+                linksGrid.style.display = 'none';
+                emptyState.classList.remove('active');
+            }
 
             try {
                 const response = await fetch('/api/links');
                 if (!response.ok) throw new Error('Network error');
-                allLinks = await response.json();
+                const serverLinks = await response.json();
+
+                // Merge server links and local links
+                const mergedMap = new Map();
+                serverLinks.forEach(item => {
+                    if (item && item.viewerLink) mergedMap.set(item.viewerLink, item);
+                });
+                localDishes.forEach(item => {
+                    if (item && item.viewerLink) {
+                        const existing = mergedMap.get(item.viewerLink);
+                        if (existing) {
+                            mergedMap.set(item.viewerLink, { ...existing, ...item });
+                        } else {
+                            mergedMap.set(item.viewerLink, item);
+                        }
+                    }
+                });
+
+                allLinks = Array.from(mergedMap.values()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 await fetchRestaurants();
                 loadingView.style.display = 'none';
                 renderLinks();
             } catch (err) {
                 console.error('Error fetching links:', err);
-                loadingView.style.display = 'none';
-                emptyState.querySelector('h3').textContent = 'Error Loading Archive';
-                document.getElementById('emptyStateDesc').textContent = 'Could not load AR items from server.';
-                emptyState.classList.add('active');
+                if (allLinks.length === 0) {
+                    loadingView.style.display = 'none';
+                    emptyState.querySelector('h3').textContent = 'Error Loading Archive';
+                    document.getElementById('emptyStateDesc').textContent = 'Could not load AR items from server.';
+                    emptyState.classList.add('active');
+                }
             }
         }
 
