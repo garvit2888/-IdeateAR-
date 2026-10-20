@@ -730,6 +730,44 @@
         const emptyState = document.getElementById('emptyState');
         const loadingView = document.getElementById('loadingView');
 
+        // Local storage helpers for restaurants (synchronized with upload.html)
+        function getStoredRestaurants() {
+            try {
+                return JSON.parse(localStorage.getItem('ideatear_restaurants') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveStoredRestaurant(name) {
+            const list = getStoredRestaurants();
+            if (!list.some(r => r.toLowerCase() === name.toLowerCase())) {
+                list.push(name);
+                localStorage.setItem('ideatear_restaurants', JSON.stringify(list));
+            }
+        }
+
+        function addAndSelectHistoryRestaurant(name) {
+            saveStoredRestaurant(name);
+            let found = false;
+            for (let i = 0; i < restaurantFilter.options.length; i++) {
+                if (restaurantFilter.options[i].value.toLowerCase() === name.toLowerCase()) {
+                    restaurantFilter.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                opt.selected = true;
+                restaurantFilter.appendChild(opt);
+                restaurantFilter.value = name;
+            }
+            selectedRestaurant = name;
+        }
+
         // Inline Add Restaurant
         const toggleAddRestBtn = document.getElementById('toggleAddRestBtn');
         const newRestPanel = document.getElementById('newRestPanel');
@@ -749,29 +787,33 @@
             newRestInputHistory.value = '';
         });
 
-        saveNewRestHistory.addEventListener('click', async () => {
+        async function handleSaveNewHistoryRestaurant() {
             const name = newRestInputHistory.value.trim();
             if (!name) return;
 
-            saveNewRestHistory.disabled = true;
+            // 1. Instantly update dropdown and filter dishes with 0ms delay
+            addAndSelectHistoryRestaurant(name);
+            newRestPanel.classList.remove('active');
+            newRestInputHistory.value = '';
+            renderLinks();
+
+            // 2. Sync to server in background
             try {
-                const res = await fetch('/api/restaurants', {
+                await fetch('/api/restaurants', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name })
                 });
-                if (res.ok) {
-                    await fetchRestaurants();
-                    selectedRestaurant = name;
-                    restaurantFilter.value = name;
-                    newRestPanel.classList.remove('active');
-                    newRestInputHistory.value = '';
-                    renderLinks();
-                }
             } catch (err) {
-                console.error('Failed to create restaurant:', err);
-            } finally {
-                saveNewRestHistory.disabled = false;
+                console.warn('Server sync error for restaurant:', err);
+            }
+        }
+
+        saveNewRestHistory.addEventListener('click', handleSaveNewHistoryRestaurant);
+        newRestInputHistory.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSaveNewHistoryRestaurant();
             }
         });
 
@@ -811,34 +853,47 @@
             });
         }
 
-        // Fetch Restaurants list
+        // Fetch Restaurants list combining local storage, server, and uploaded dishes
         async function fetchRestaurants() {
+            const restSet = new Set(['General Menu', 'The Italian Bistro', 'Spice Route Kitchen', 'Sunset Pizzeria']);
+
+            // 1. Merge local storage
+            getStoredRestaurants().forEach(r => restSet.add(r));
+
+            // 2. Merge server list
             try {
                 const res = await fetch('/api/restaurants');
                 if (res.ok) {
-                    allRestaurants = await res.json();
+                    const serverData = await res.json();
+                    if (Array.isArray(serverData)) {
+                        serverData.forEach(r => {
+                            if (r && r.name) restSet.add(r.name);
+                        });
+                    }
                 }
             } catch (e) {
-                allRestaurants = [{ name: 'General Menu' }];
+                console.warn('Failed to fetch server restaurants:', e);
             }
 
-            // Also collect any unique restaurant names already on links
-            const restSet = new Set(allRestaurants.map(r => r.name));
+            // 3. Merge restaurants from links
             allLinks.forEach(link => {
-                if (link.restaurant) restSet.add(link.restaurant);
+                if (link && link.restaurant) restSet.add(link.restaurant);
             });
 
             // Populate dropdown
-            const currentVal = restaurantFilter.value;
+            const currentVal = selectedRestaurant || restaurantFilter.value || 'all';
             restaurantFilter.innerHTML = '<option value="all">All Restaurants</option>';
             Array.from(restSet).sort().forEach(rName => {
                 const opt = document.createElement('option');
                 opt.value = rName;
                 opt.textContent = rName;
+                if (currentVal.toLowerCase() === rName.toLowerCase()) {
+                    opt.selected = true;
+                }
                 restaurantFilter.appendChild(opt);
             });
 
-            if (currentVal && restSet.has(currentVal)) {
+            if (currentVal && currentVal !== 'all') {
                 restaurantFilter.value = currentVal;
             }
         }
@@ -987,7 +1042,10 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', fetchLinks);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchRestaurants();
+            fetchLinks();
+        });
     </script>
 </body>
 </html>

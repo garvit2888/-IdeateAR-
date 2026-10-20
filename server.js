@@ -353,20 +353,79 @@ app.get('/api/config', (req, res) => {
     });
 });
 
-// Restaurant management helpers
+// Restaurant management helpers (with in-memory cache, Supabase Storage sync, and /tmp fallback for serverless)
 const restaurantsPath = path.join(__dirname, 'restaurants.json');
+const tmpRestaurantsPath = path.join('/tmp', 'restaurants.json');
 
-async function getRestaurantsList() {
-    let list = [];
+let inMemoryRestaurants = [
+    { id: 'rest_general', name: 'General Menu', createdAt: '2026-10-20T12:00:00.000Z' },
+    { id: 'rest_italian', name: 'The Italian Bistro', createdAt: '2026-10-20T12:00:00.000Z' },
+    { id: 'rest_spice', name: 'Spice Route Kitchen', createdAt: '2026-10-20T12:00:00.000Z' },
+    { id: 'rest_sunset', name: 'Sunset Pizzeria', createdAt: '2026-10-20T16:20:42.000Z' }
+];
+
+async function initRestaurants() {
+    // 1. Try local file
     try {
         const data = await fs.readFile(restaurantsPath, 'utf8');
-        list = JSON.parse(data);
-    } catch (e) {
-        list = [
-            { id: 'rest_general', name: 'General Menu', createdAt: new Date().toISOString() }
-        ];
-    }
-    return list;
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+            parsed.forEach(r => {
+                if (r && r.name && !inMemoryRestaurants.some(m => m.name.toLowerCase() === r.name.toLowerCase())) {
+                    inMemoryRestaurants.push(r);
+                }
+            });
+        }
+    } catch (e) {}
+
+    // 2. Try /tmp file
+    try {
+        const tmpData = await fs.readFile(tmpRestaurantsPath, 'utf8');
+        const parsedTmp = JSON.parse(tmpData);
+        if (Array.isArray(parsedTmp)) {
+            parsedTmp.forEach(r => {
+                if (r && r.name && !inMemoryRestaurants.some(m => m.name.toLowerCase() === r.name.toLowerCase())) {
+                    inMemoryRestaurants.push(r);
+                }
+            });
+        }
+    } catch (e) {}
+
+    // 3. Try Supabase cloud metadata
+    try {
+        const { data, error } = await supabase.storage.from('models').download('restaurants-metadata.json');
+        if (!error && data) {
+            const text = await data.text();
+            const cloudList = JSON.parse(text);
+            if (Array.isArray(cloudList)) {
+                cloudList.forEach(r => {
+                    if (r && r.name && !inMemoryRestaurants.some(m => m.name.toLowerCase() === r.name.toLowerCase())) {
+                        inMemoryRestaurants.push(r);
+                    }
+                });
+            }
+        }
+    } catch (e) {}
+}
+initRestaurants();
+
+async function getRestaurantsList() {
+    // Attempt background sync from Supabase Storage
+    try {
+        const { data, error } = await supabase.storage.from('models').download('restaurants-metadata.json');
+        if (!error && data) {
+            const text = await data.text();
+            const cloudList = JSON.parse(text);
+            if (Array.isArray(cloudList)) {
+                cloudList.forEach(r => {
+                    if (r && r.name && !inMemoryRestaurants.some(m => m.name.toLowerCase() === r.name.toLowerCase())) {
+                        inMemoryRestaurants.push(r);
+                    }
+                });
+            }
+        }
+    } catch (e) {}
+    return inMemoryRestaurants;
 }
 
 async function saveRestaurant(name) {
@@ -374,8 +433,7 @@ async function saveRestaurant(name) {
     const trimmed = name.trim();
     if (!trimmed) return null;
 
-    let list = await getRestaurantsList();
-    const existing = list.find(r => r.name.toLowerCase() === trimmed.toLowerCase());
+    let existing = inMemoryRestaurants.find(r => r.name.toLowerCase() === trimmed.toLowerCase());
     if (existing) return existing;
 
     const newRest = {
@@ -383,12 +441,29 @@ async function saveRestaurant(name) {
         name: trimmed,
         createdAt: new Date().toISOString()
     };
-    list.push(newRest);
+    inMemoryRestaurants.push(newRest);
+
+    // 1. Sync to Supabase Storage for universal serverless cross-instance sync
     try {
-        await fs.writeFile(restaurantsPath, JSON.stringify(list, null, 4), 'utf8');
-    } catch (err) {
-        console.error('Error writing restaurants.json:', err);
+        await supabase.storage.from('models').upload(
+            'restaurants-metadata.json',
+            Buffer.from(JSON.stringify(inMemoryRestaurants, null, 2)),
+            { upsert: true, contentType: 'application/json' }
+        );
+    } catch (e) {
+        console.warn('Could not sync restaurant to Supabase Storage:', e.message);
     }
+
+    // 2. Try saving to /tmp first (always writable on serverless)
+    try {
+        await fs.writeFile(tmpRestaurantsPath, JSON.stringify(inMemoryRestaurants, null, 4), 'utf8');
+    } catch (e) {}
+
+    // 3. Also try saving to local path if writable
+    try {
+        await fs.writeFile(restaurantsPath, JSON.stringify(inMemoryRestaurants, null, 4), 'utf8');
+    } catch (e) {}
+
     return newRest;
 }
 
@@ -410,9 +485,9 @@ app.post('/api/restaurants', async (req, res) => {
             return res.status(400).json({ error: 'Restaurant name is required' });
         }
         const restaurant = await saveRestaurant(name);
-        const all = await getRestaurantsList();
-        res.json({ success: true, restaurant, restaurants: all });
+        res.json({ success: true, restaurant, restaurants: inMemoryRestaurants });
     } catch (error) {
+        console.error('Error saving restaurant:', error);
         res.status(500).json({ error: 'Failed to create restaurant' });
     }
 });
@@ -446,7 +521,9 @@ app.post('/api/register-link', async (req, res) => {
         } catch (readErr) {}
         
         history.unshift(historyItem);
-        await fs.writeFile(historyPath, JSON.stringify(history, null, 4), 'utf8');
+        try {
+            await fs.writeFile(historyPath, JSON.stringify(history, null, 4), 'utf8');
+        } catch (e) {}
 
         res.json({ success: true, viewerLink, item: historyItem });
     } catch (err) {

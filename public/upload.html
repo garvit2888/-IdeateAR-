@@ -676,26 +676,72 @@
             })
             .catch(() => {});
 
-        // Load restaurants into dropdown
-        async function loadRestaurants(selectName) {
+        function getStoredRestaurants() {
+            try {
+                return JSON.parse(localStorage.getItem('ideatear_restaurants') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveStoredRestaurant(name) {
+            const list = getStoredRestaurants();
+            if (!list.some(r => r.toLowerCase() === name.toLowerCase())) {
+                list.push(name);
+                localStorage.setItem('ideatear_restaurants', JSON.stringify(list));
+            }
+        }
+
+        const restaurantNamesSet = new Set(['General Menu', 'The Italian Bistro', 'Spice Route Kitchen', 'Sunset Pizzeria']);
+
+        function renderRestaurantOptions(selectName) {
             const select = document.getElementById('restaurantSelect');
+            if (!select) return;
+
+            // Merge localStorage
+            getStoredRestaurants().forEach(r => restaurantNamesSet.add(r));
+
+            const currentVal = selectName || select.value || 'General Menu';
+            select.innerHTML = '';
+            Array.from(restaurantNamesSet).sort().forEach(rName => {
+                const opt = document.createElement('option');
+                opt.value = rName;
+                opt.textContent = rName;
+                if (currentVal.toLowerCase() === rName.toLowerCase()) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+
+            if (selectName) {
+                select.value = selectName;
+            }
+        }
+
+        function addAndSelectRestaurant(name) {
+            saveStoredRestaurant(name);
+            restaurantNamesSet.add(name);
+            renderRestaurantOptions(name);
+        }
+
+        // Load restaurants into dropdown combining server and local storage
+        async function loadRestaurants(selectName) {
+            renderRestaurantOptions(selectName);
+
+            // Fetch server restaurants and update
             try {
                 const res = await fetch('/api/restaurants');
                 if (res.ok) {
-                    const restaurants = await res.json();
-                    select.innerHTML = '';
-                    restaurants.forEach(r => {
-                        const opt = document.createElement('option');
-                        opt.value = r.name;
-                        opt.textContent = r.name;
-                        if (selectName && r.name.toLowerCase() === selectName.toLowerCase()) {
-                            opt.selected = true;
-                        }
-                        select.appendChild(opt);
-                    });
+                    const serverList = await res.json();
+                    if (Array.isArray(serverList)) {
+                        serverList.forEach(r => {
+                            if (r && r.name) restaurantNamesSet.add(r.name);
+                        });
+                        renderRestaurantOptions(selectName);
+                    }
                 }
             } catch (err) {
-                console.warn('Could not load restaurants list:', err);
+                console.warn('Could not load server restaurants:', err);
             }
         }
 
@@ -718,26 +764,32 @@
             newRestInput.value = '';
         });
 
-        confirmNewRestBtn.addEventListener('click', async () => {
+        async function handleSaveNewRestaurant() {
             const name = newRestInput.value.trim();
             if (!name) return;
 
-            confirmNewRestBtn.disabled = true;
+            // Immediately add to dropdown and select it!
+            addAndSelectRestaurant(name);
+            newRestContainer.classList.remove('active');
+            newRestInput.value = '';
+
+            // Send to server in background
             try {
-                const res = await fetch('/api/restaurants', {
+                await fetch('/api/restaurants', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name })
                 });
-                if (res.ok) {
-                    await loadRestaurants(name);
-                    newRestContainer.classList.remove('active');
-                    newRestInput.value = '';
-                }
             } catch (err) {
-                console.error('Failed to create restaurant:', err);
-            } finally {
-                confirmNewRestBtn.disabled = false;
+                console.warn('Server sync error for restaurant:', err);
+            }
+        }
+
+        confirmNewRestBtn.addEventListener('click', handleSaveNewRestaurant);
+        newRestInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSaveNewRestaurant();
             }
         });
 
