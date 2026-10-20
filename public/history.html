@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Links History - IdeateAR</title>
+    <title>AR Food Model Archive - IdeateAR Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #F05545;
             --primary-hover: #E63E3E;
-            --bg-color: #FAFAFA;
-            --text-color: #2D2D2D;
-            --text-muted: #666666;
-            --border-color: #E1E1E1;
-            --shadow-color: rgba(240, 85, 69, 0.1);
+            --primary-light: rgba(240, 85, 69, 0.08);
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
             --card-bg: #FFFFFF;
-            --success-color: #4CAF50;
+            --tag-bg: #F1F5F9;
+            --tag-text: #475569;
         }
 
         * {
@@ -25,7 +26,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -33,35 +34,36 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2rem;
+            padding: 2.5rem 1.5rem;
         }
 
         .logo {
             margin-bottom: 2rem;
-            width: 200px;
+            width: 170px;
             height: auto;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: opacity 0.2s ease;
         }
 
         .logo:hover {
-            transform: scale(1.02);
+            opacity: 0.85;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1040px;
             width: 100%;
             background: var(--card-bg);
             padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px var(--shadow-color);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
         }
 
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 1.5rem;
             flex-wrap: wrap;
@@ -69,347 +71,496 @@
         }
 
         .header-title-area h1 {
-            font-size: 2.2rem;
-            color: var(--primary-color);
+            font-size: 1.85rem;
+            color: var(--text-color);
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.02em;
             margin-bottom: 0.25rem;
         }
 
         .header-title-area p {
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .back-btn {
             display: inline-flex;
             align-items: center;
-            background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 12px;
+            gap: 0.5rem;
+            background: #FFFFFF;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 0.65rem 1.15rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             font-weight: 600;
             text-decoration: none;
-            gap: 0.5rem;
         }
 
         .back-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateX(-3px);
-            box-shadow: 0 4px 12px var(--shadow-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: var(--primary-light);
         }
 
-        /* Toolbar filters & search */
+        .back-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2;
+        }
+
+        /* Restaurant Control Bar */
+        .restaurant-filter-bar {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .restaurant-select-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .restaurant-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            white-space: nowrap;
+        }
+
+        .restaurant-label svg {
+            width: 17px;
+            height: 17px;
+            stroke: var(--text-muted);
+        }
+
+        .restaurant-select {
+            width: 100%;
+            max-width: 320px;
+            padding: 0.65rem 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--text-color);
+            background: #FFFFFF;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .restaurant-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(240, 85, 69, 0.1);
+        }
+
+        .btn-add-restaurant {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-add-restaurant:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-add-restaurant svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .new-rest-inline {
+            width: 100%;
+            display: none;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .new-rest-inline.active {
+            display: flex;
+        }
+
+        .new-rest-input {
+            flex: 1;
+            padding: 0.55rem 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .new-rest-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-sm-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.55rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-sm-secondary {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.55rem 0.85rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* Search and Filter Toolbar */
         .toolbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
-            gap: 1.5rem;
+            margin-bottom: 1.75rem;
+            gap: 1.25rem;
             flex-wrap: wrap;
         }
 
         .search-wrapper {
             position: relative;
             flex: 1;
-            min-width: 280px;
+            min-width: 260px;
         }
 
         .search-input {
             width: 100%;
-            padding: 1rem 1.25rem 1rem 2.75rem;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 1rem;
+            padding: 0.7rem 1rem 0.7rem 2.4rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.92rem;
             outline: none;
-            background-color: var(--bg-color);
+            background-color: #FFFFFF;
             color: var(--text-color);
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .search-input:focus {
             border-color: var(--primary-color);
-            background-color: #FFFFFF;
-            box-shadow: 0 4px 12px rgba(240, 85, 69, 0.08);
+            box-shadow: 0 0 0 3px rgba(240, 85, 69, 0.1);
         }
 
-        .search-icon {
+        .search-icon-svg {
             position: absolute;
-            left: 1rem;
+            left: 0.85rem;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.1rem;
-            color: var(--text-muted);
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
             pointer-events: none;
         }
 
         .filter-group {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
         }
 
         .filter-chip {
-            background: var(--bg-color);
+            background: #FFFFFF;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 0.95rem;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .filter-chip:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
+            border-color: var(--text-muted);
+            color: var(--text-color);
         }
 
         .filter-chip.active {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 4px 10px var(--shadow-color);
+            background: var(--text-color);
+            border-color: var(--text-color);
+            color: #FFFFFF;
         }
 
-        /* History items list/grid */
+        /* Dishes Grid */
         .links-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 1.25rem;
             margin-top: 1rem;
         }
 
         .link-card {
-            background: var(--bg-color);
+            background: #FFFFFF;
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
+            border-radius: 12px;
+            padding: 1.35rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.2s ease;
             position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
         .link-card:hover {
-            transform: translateY(-5px);
-            background: #FFFFFF;
-            border-color: var(--primary-color);
-            box-shadow: 0 8px 24px rgba(240, 85, 69, 0.08);
+            border-color: #CBD5E1;
+            box-shadow: 0 6px 18px -3px rgba(15, 23, 42, 0.08);
+            transform: translateY(-2px);
         }
 
-        .link-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background-color: var(--primary-color);
-            opacity: 0.7;
-        }
-
-        .card-header {
+        .card-top {
             margin-bottom: 1.25rem;
         }
 
-        .item-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-color);
-            margin-bottom: 0.25rem;
-            white-space: nowrap;
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+            gap: 0.5rem;
+        }
+
+        .restaurant-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            font-size: 0.76rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #E2E8F0;
+            max-width: 180px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .restaurant-badge svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            flex-shrink: 0;
+        }
+
+        .item-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.35rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .item-date {
-            font-size: 0.85rem;
-            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+        }
+
+        .item-date svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
         }
 
         .format-badges {
             display: flex;
-            gap: 0.4rem;
-            margin-top: 0.75rem;
+            gap: 0.35rem;
+            flex-wrap: wrap;
         }
 
         .badge {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-            text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
         }
 
         .badge-glb {
-            background: rgba(33, 150, 243, 0.1);
-            color: #1976D2;
-            border: 1px solid rgba(33, 150, 243, 0.2);
+            background: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #BFDBFE;
         }
 
         .badge-usdz {
-            background: rgba(156, 39, 176, 0.1);
-            color: #7B1FA2;
-            border: 1px solid rgba(156, 39, 176, 0.2);
+            background: #FDF2F8;
+            color: #BE185D;
+            border: 1px solid #FBCFE8;
         }
 
         .card-actions {
             display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            gap: 0.6rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
         }
 
         .action-btn {
             flex: 1;
-            padding: 0.75rem;
-            font-size: 0.9rem;
+            padding: 0.55rem 0.85rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
             font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
             text-align: center;
             text-decoration: none;
+            cursor: pointer;
             transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .btn-copy {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-copy:hover {
+            background: var(--bg-color);
+        }
+
+        .btn-copy.copied {
+            background: #ECFDF5;
+            color: #065F46;
+            border-color: #A7F3D0;
         }
 
         .btn-view {
             background: var(--primary-color);
-            color: white;
-            border: none;
+            border: 1px solid var(--primary-color);
+            color: #FFFFFF;
         }
 
         .btn-view:hover {
             background: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-copy {
-            background: white;
-            color: var(--text-color);
-            border: 1.5px solid var(--border-color);
-        }
-
-        .btn-copy:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            background: rgba(240, 85, 69, 0.02);
-        }
-
-        .btn-copy.copied {
-            background: var(--success-color);
-            color: white;
-            border-color: var(--success-color);
         }
 
         /* Empty State */
         .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
             display: none;
+            text-align: center;
+            padding: 3.5rem 1.5rem;
+            background: var(--bg-color);
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+            margin-top: 1.5rem;
         }
 
         .empty-state.active {
             display: block;
-            animation: fadeIn 0.5s ease;
         }
 
-        .empty-icon {
-            font-size: 4.5rem;
-            margin-bottom: 1.5rem;
-            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.05));
+        .empty-icon-svg {
+            width: 44px;
+            height: 44px;
+            stroke: var(--text-muted);
+            margin-bottom: 1rem;
+            stroke-width: 1.5;
         }
 
         .empty-state h3 {
-            font-size: 1.5rem;
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
+            font-size: 1.15rem;
             font-weight: 700;
+            margin-bottom: 0.35rem;
+            color: var(--text-color);
         }
 
         .empty-state p {
             color: var(--text-muted);
-            max-width: 400px;
+            font-size: 0.9rem;
+            max-width: 420px;
             margin: 0 auto 1.5rem;
         }
 
-        .empty-state .btn-primary {
-            display: inline-block;
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
             background: var(--primary-color);
-            color: white;
-            padding: 0.75rem 2rem;
-            border-radius: 12px;
-            text-decoration: none;
+            color: #FFFFFF;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px var(--shadow-color);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
         }
 
-        .empty-state .btn-primary:hover {
+        .btn-primary:hover {
             background: var(--primary-hover);
-            transform: translateY(-2px);
         }
 
-        /* Loading Skeleton */
+        /* Skeleton Loading */
         .loading-skeleton {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 1.25rem;
         }
 
         .skeleton-card {
-            background: var(--bg-color);
+            background: #FFFFFF;
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            height: 180px;
+            border-radius: 12px;
+            padding: 1.35rem;
+            min-height: 180px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
         .skeleton-line {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
             background-size: 200% 100%;
             animation: skeleton-loading 1.5s infinite;
             border-radius: 4px;
-        }
-
-        .skeleton-title {
-            height: 24px;
-            width: 60%;
-            margin-bottom: 8px;
-        }
-
-        .skeleton-date {
-            height: 16px;
-            width: 40%;
-        }
-
-        .skeleton-badge {
-            height: 20px;
-            width: 80px;
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-
-        .skeleton-button {
-            height: 36px;
-            width: 48%;
-            border-radius: 8px;
         }
 
         @keyframes skeleton-loading {
@@ -417,108 +568,127 @@
             100% { background-position: -200% 0; }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
             body {
-                padding: 1rem;
+                padding: 1.5rem 1rem;
             }
-
             .container {
-                padding: 1.5rem;
+                padding: 1.5rem 1.25rem;
             }
-
             .header {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
-
             .back-btn {
                 width: 100%;
                 justify-content: center;
             }
-
             .toolbar {
                 flex-direction: column;
                 align-items: stretch;
             }
-
             .filter-group {
                 width: 100%;
             }
-
             .filter-chip {
                 flex: 1;
                 text-align: center;
-                padding: 0.5rem;
-                font-size: 0.8rem;
             }
         }
     </style>
 </head>
 <body>
     <img src="/logo.png" alt="IdeateAR" class="logo" onclick="window.location.href='/'">
+    
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <div class="header-title-area">
-                <h1>AR Viewer History</h1>
-                <p>Manage and access previously uploaded WebAR food models</p>
+                <h1>AR Food Model Archive</h1>
+                <p>Organize, filter, and access 3D WebAR menu items by restaurant</p>
             </div>
             <a href="/upload.html" class="back-btn">
-                <span>←</span> Back to Upload
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Upload Model
             </a>
         </div>
 
+        <!-- Restaurant Navigation & Categorization Bar -->
+        <div class="restaurant-filter-bar">
+            <div class="restaurant-select-wrapper">
+                <label class="restaurant-label" for="restaurantFilter">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Restaurant:
+                </label>
+                <select id="restaurantFilter" class="restaurant-select">
+                    <option value="all">All Restaurants</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-add-restaurant" id="toggleAddRestBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Restaurant
+            </button>
+
+            <!-- Inline add restaurant panel -->
+            <div class="new-rest-inline" id="newRestPanel">
+                <input type="text" id="newRestInputHistory" class="new-rest-input" placeholder="Enter new restaurant name..." />
+                <button type="button" class="btn-sm-primary" id="saveNewRestHistory">Save</button>
+                <button type="button" class="btn-sm-secondary" id="cancelNewRestHistory">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Search and Format Toolbar -->
         <div class="toolbar">
             <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search by food name...">
+                <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by food item name...">
             </div>
             <div class="filter-group">
                 <button class="filter-chip active" data-filter="all">All Formats</button>
-                <button class="filter-chip" data-filter="glb">.GLB (Android/PC)</button>
-                <button class="filter-chip" data-filter="usdz">.USDZ (iOS)</button>
+                <button class="filter-chip" data-filter="glb">.GLB (Android/Web)</button>
+                <button class="filter-chip" data-filter="usdz">.USDZ (iOS AR)</button>
                 <button class="filter-chip" data-filter="both">Both Formats</button>
             </div>
         </div>
 
-        <!-- Loading View -->
+        <!-- Skeleton Loading View -->
         <div id="loadingView" class="loading-skeleton">
             <div class="skeleton-card">
                 <div>
-                    <div class="skeleton-line skeleton-title"></div>
-                    <div class="skeleton-line skeleton-date"></div>
-                    <div class="skeleton-line skeleton-badge"></div>
+                    <div class="skeleton-line" style="height: 18px; width: 45%; margin-bottom: 10px;"></div>
+                    <div class="skeleton-line" style="height: 24px; width: 75%; margin-bottom: 8px;"></div>
+                    <div class="skeleton-line" style="height: 14px; width: 35%;"></div>
                 </div>
-                <div style="display: flex; gap: 4%; width: 100%;">
-                    <div class="skeleton-line skeleton-button"></div>
-                    <div class="skeleton-line skeleton-button"></div>
-                </div>
+                <div class="skeleton-line" style="height: 34px; width: 100%; margin-top: 15px;"></div>
             </div>
             <div class="skeleton-card">
                 <div>
-                    <div class="skeleton-line skeleton-title"></div>
-                    <div class="skeleton-line skeleton-date"></div>
-                    <div class="skeleton-line skeleton-badge"></div>
+                    <div class="skeleton-line" style="height: 18px; width: 45%; margin-bottom: 10px;"></div>
+                    <div class="skeleton-line" style="height: 24px; width: 75%; margin-bottom: 8px;"></div>
+                    <div class="skeleton-line" style="height: 14px; width: 35%;"></div>
                 </div>
-                <div style="display: flex; gap: 4%; width: 100%;">
-                    <div class="skeleton-line skeleton-button"></div>
-                    <div class="skeleton-line skeleton-button"></div>
-                </div>
+                <div class="skeleton-line" style="height: 34px; width: 100%; margin-top: 15px;"></div>
             </div>
             <div class="skeleton-card">
                 <div>
-                    <div class="skeleton-line skeleton-title"></div>
-                    <div class="skeleton-line skeleton-date"></div>
-                    <div class="skeleton-line skeleton-badge"></div>
+                    <div class="skeleton-line" style="height: 18px; width: 45%; margin-bottom: 10px;"></div>
+                    <div class="skeleton-line" style="height: 24px; width: 75%; margin-bottom: 8px;"></div>
+                    <div class="skeleton-line" style="height: 14px; width: 35%;"></div>
                 </div>
-                <div style="display: flex; gap: 4%; width: 100%;">
-                    <div class="skeleton-line skeleton-button"></div>
-                    <div class="skeleton-line skeleton-button"></div>
-                </div>
+                <div class="skeleton-line" style="height: 34px; width: 100%; margin-top: 15px;"></div>
             </div>
         </div>
 
@@ -527,25 +697,85 @@
 
         <!-- Empty State -->
         <div id="emptyState" class="empty-state">
-            <div class="empty-icon">🍔</div>
-            <h3>No AR Links Found</h3>
-            <p>You haven't uploaded any 3D menu items yet, or no items match your search filter.</p>
-            <a href="/upload.html" class="btn-primary">Upload Your First Model</a>
+            <svg class="empty-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <h3>No Food Models Found</h3>
+            <p id="emptyStateDesc">No 3D menu items match the selected restaurant or filter criteria.</p>
+            <a href="/upload.html" class="btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Upload Food Model
+            </a>
         </div>
     </div>
 
     <script>
         let allLinks = [];
+        let allRestaurants = [];
+        let selectedRestaurant = 'all';
         let currentFilter = 'all';
         let searchQuery = '';
 
         const searchInput = document.getElementById('searchInput');
         const filterChips = document.querySelectorAll('.filter-chip');
+        const restaurantFilter = document.getElementById('restaurantFilter');
         const linksGrid = document.getElementById('linksGrid');
         const emptyState = document.getElementById('emptyState');
         const loadingView = document.getElementById('loadingView');
 
-        // Format date beautifully
+        // Inline Add Restaurant
+        const toggleAddRestBtn = document.getElementById('toggleAddRestBtn');
+        const newRestPanel = document.getElementById('newRestPanel');
+        const newRestInputHistory = document.getElementById('newRestInputHistory');
+        const saveNewRestHistory = document.getElementById('saveNewRestHistory');
+        const cancelNewRestHistory = document.getElementById('cancelNewRestHistory');
+
+        toggleAddRestBtn.addEventListener('click', () => {
+            newRestPanel.classList.toggle('active');
+            if (newRestPanel.classList.contains('active')) {
+                newRestInputHistory.focus();
+            }
+        });
+
+        cancelNewRestHistory.addEventListener('click', () => {
+            newRestPanel.classList.remove('active');
+            newRestInputHistory.value = '';
+        });
+
+        saveNewRestHistory.addEventListener('click', async () => {
+            const name = newRestInputHistory.value.trim();
+            if (!name) return;
+
+            saveNewRestHistory.disabled = true;
+            try {
+                const res = await fetch('/api/restaurants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                if (res.ok) {
+                    await fetchRestaurants();
+                    selectedRestaurant = name;
+                    restaurantFilter.value = name;
+                    newRestPanel.classList.remove('active');
+                    newRestInputHistory.value = '';
+                    renderLinks();
+                }
+            } catch (err) {
+                console.error('Failed to create restaurant:', err);
+            } finally {
+                saveNewRestHistory.disabled = false;
+            }
+        });
+
+        // Format Date
         function formatDate(dateString) {
             try {
                 const date = new Date(dateString);
@@ -562,49 +792,97 @@
             }
         }
 
-        // Copy link to clipboard helper
+        // Copy link handler
         function copyLink(btn, link) {
             const absoluteLink = window.location.origin + link;
             navigator.clipboard.writeText(absoluteLink).then(() => {
-                const originalText = btn.innerHTML;
-                btn.innerHTML = 'Copied! ✓';
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = 'Copied';
                 btn.classList.add('copied');
                 btn.style.pointerEvents = 'none';
 
                 setTimeout(() => {
-                    btn.innerHTML = originalText;
+                    btn.innerHTML = originalHtml;
                     btn.classList.remove('copied');
                     btn.style.pointerEvents = 'auto';
                 }, 2000);
             }).catch(err => {
-                console.error('Could not copy text: ', err);
+                console.error('Could not copy link:', err);
             });
         }
 
-        // Render links based on search and filters
+        // Fetch Restaurants list
+        async function fetchRestaurants() {
+            try {
+                const res = await fetch('/api/restaurants');
+                if (res.ok) {
+                    allRestaurants = await res.json();
+                }
+            } catch (e) {
+                allRestaurants = [{ name: 'General Menu' }];
+            }
+
+            // Also collect any unique restaurant names already on links
+            const restSet = new Set(allRestaurants.map(r => r.name));
+            allLinks.forEach(link => {
+                if (link.restaurant) restSet.add(link.restaurant);
+            });
+
+            // Populate dropdown
+            const currentVal = restaurantFilter.value;
+            restaurantFilter.innerHTML = '<option value="all">All Restaurants</option>';
+            Array.from(restSet).sort().forEach(rName => {
+                const opt = document.createElement('option');
+                opt.value = rName;
+                opt.textContent = rName;
+                restaurantFilter.appendChild(opt);
+            });
+
+            if (currentVal && restSet.has(currentVal)) {
+                restaurantFilter.value = currentVal;
+            }
+        }
+
+        // Render Cards
         function renderLinks() {
             linksGrid.innerHTML = '';
             
             const filtered = allLinks.filter(item => {
-                // Name filter
-                const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+                const itemRestaurant = item.restaurant || 'General Menu';
                 
-                // Format filter
-                let matchesFormat = true;
-                if (currentFilter === 'glb') {
-                    matchesFormat = !!item.glb && !item.usdz;
-                } else if (currentFilter === 'usdz') {
-                    matchesFormat = !item.glb && !!item.usdz;
-                } else if (currentFilter === 'both') {
-                    matchesFormat = !!item.glb && !!item.usdz;
+                // Restaurant filter
+                if (selectedRestaurant !== 'all') {
+                    if (itemRestaurant.toLowerCase() !== selectedRestaurant.toLowerCase()) {
+                        return false;
+                    }
                 }
 
-                return matchesSearch && matchesFormat;
+                // Name search
+                const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      itemRestaurant.toLowerCase().includes(searchQuery.toLowerCase());
+                if (!matchesSearch) return false;
+
+                // Format filter
+                if (currentFilter === 'glb') {
+                    return !!item.glb && !item.usdz;
+                } else if (currentFilter === 'usdz') {
+                    return !item.glb && !!item.usdz;
+                } else if (currentFilter === 'both') {
+                    return !!item.glb && !!item.usdz;
+                }
+
+                return true;
             });
 
             if (filtered.length === 0) {
                 linksGrid.style.display = 'none';
                 emptyState.classList.add('active');
+                const emptyDesc = document.getElementById('emptyStateDesc');
+                if (selectedRestaurant !== 'all') {
+                    emptyDesc.textContent = `No dishes found for restaurant "${selectedRestaurant}".`;
+                } else {
+                    emptyDesc.textContent = 'No 3D menu items match your search filter.';
+                }
             } else {
                 emptyState.classList.remove('active');
                 linksGrid.style.display = 'grid';
@@ -613,24 +891,52 @@
                     const card = document.createElement('div');
                     card.className = 'link-card';
 
-                    // Format badges
                     let badgesHtml = '';
                     if (item.glb) badgesHtml += '<span class="badge badge-glb">.GLB</span>';
                     if (item.usdz) badgesHtml += '<span class="badge badge-usdz">.USDZ</span>';
 
+                    const itemRestaurant = item.restaurant || 'General Menu';
+
                     card.innerHTML = `
-                        <div class="card-header">
+                        <div class="card-top">
+                            <div class="card-meta">
+                                <span class="restaurant-badge" title="${itemRestaurant}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    </svg>
+                                    ${itemRestaurant}
+                                </span>
+                                <div class="format-badges">
+                                    ${badgesHtml}
+                                </div>
+                            </div>
                             <h3 class="item-name" title="${item.name}">${item.name}</h3>
                             <div class="item-date">
-                                📅 <span>${formatDate(item.createdAt)}</span>
-                            </div>
-                            <div class="format-badges">
-                                ${badgesHtml}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span>${formatDate(item.createdAt)}</span>
                             </div>
                         </div>
                         <div class="card-actions">
-                            <button class="action-btn btn-copy" onclick="copyLink(this, '${item.viewerLink}')">Copy Link</button>
-                            <a href="${item.viewerLink}" target="_blank" class="action-btn btn-view">View AR</a>
+                            <button class="action-btn btn-copy" onclick="copyLink(this, '${item.viewerLink}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Copy Link
+                            </button>
+                            <a href="${item.viewerLink}" target="_blank" class="action-btn btn-view">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                                View AR
+                            </a>
                         </div>
                     `;
 
@@ -639,34 +945,36 @@
             }
         }
 
-        // Fetch links from backend API
-        function fetchLinks() {
+        // Fetch links from backend
+        async function fetchLinks() {
             loadingView.style.display = 'grid';
             linksGrid.style.display = 'none';
             emptyState.classList.remove('active');
 
-            fetch('/api/links')
-                .then(response => {
-                    if (!response.ok) throw new Error('API response not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    allLinks = data;
-                    loadingView.style.display = 'none';
-                    renderLinks();
-                })
-                .catch(error => {
-                    console.error('Error fetching links:', error);
-                    loadingView.style.display = 'none';
-                    emptyState.querySelector('h3').textContent = 'Error Loading History';
-                    emptyState.querySelector('p').textContent = 'Could not retrieve AR history from the server.';
-                    emptyState.classList.add('active');
-                });
+            try {
+                const response = await fetch('/api/links');
+                if (!response.ok) throw new Error('Network error');
+                allLinks = await response.json();
+                await fetchRestaurants();
+                loadingView.style.display = 'none';
+                renderLinks();
+            } catch (err) {
+                console.error('Error fetching links:', err);
+                loadingView.style.display = 'none';
+                emptyState.querySelector('h3').textContent = 'Error Loading Archive';
+                document.getElementById('emptyStateDesc').textContent = 'Could not load AR items from server.';
+                emptyState.classList.add('active');
+            }
         }
 
-        // Event listeners
+        // Listeners
         searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value;
+            renderLinks();
+        });
+
+        restaurantFilter.addEventListener('change', (e) => {
+            selectedRestaurant = e.target.value;
             renderLinks();
         });
 
@@ -679,7 +987,6 @@
             });
         });
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', fetchLinks);
     </script>
 </body>

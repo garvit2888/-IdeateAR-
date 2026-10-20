@@ -1,0 +1,22 @@
+[
+    {
+        "id": "rest_general",
+        "name": "General Menu",
+        "createdAt": "2026-10-20T12:00:00.000Z"
+    },
+    {
+        "id": "rest_italian",
+        "name": "The Italian Bistro",
+        "createdAt": "2026-10-20T12:00:00.000Z"
+    },
+    {
+        "id": "rest_spice",
+        "name": "Spice Route Kitchen",
+        "createdAt": "2026-10-20T12:00:00.000Z"
+    },
+    {
+        "id": "rest_1792513242767",
+        "name": "Sunset Pizzeria",
+        "createdAt": "2026-10-20T16:20:42.767Z"
+    }
+]

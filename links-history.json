@@ -1,5 +1,14 @@
 [
     {
+        "id": "1792513258084",
+        "name": "Four Cheese Pizza",
+        "restaurant": "Sunset Pizzeria",
+        "glb": "/pizza.glb",
+        "usdz": "/pizza.usdz",
+        "viewerLink": "/viewer.html?glb=%2Fpizza.glb&usdz=%2Fpizza.usdz",
+        "createdAt": "2026-10-20T16:20:58.084Z"
+    },
+    {
         "id": "1779784390602",
         "name": "1748354778450",
         "glb": "https://gozuzgspptucveitionb.supabase.co/storage/v1/object/public/models/1779784345001-1748354778450.glb",

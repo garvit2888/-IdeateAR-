@@ -129,6 +129,7 @@ app.get('/api/links', async (req, res) => {
                 supabaseHistory.push({
                     id: file.id || baseWithPrefix,
                     name: displayName,
+                    restaurant: 'General Menu',
                     glb: glbUrl,
                     usdz: usdzUrl,
                     viewerLink: `/viewer.html?glb=${glbUrl || ''}&usdz=${usdzUrl || ''}`,
@@ -145,8 +146,9 @@ app.get('/api/links', async (req, res) => {
             combinedMap.set(item.viewerLink, item);
         }
 
-        // 2. Add Local JSON history
+        // 2. Add Local JSON history (preserves explicit restaurant assignments)
         for (const item of localHistory) {
+            item.restaurant = item.restaurant || 'General Menu';
             combinedMap.set(item.viewerLink, item);
         }
 
@@ -303,9 +305,13 @@ app.post('/upload', upload.fields([{ name: 'glb' }, { name: 'usdz' }]), async (r
                              .map(w => w.charAt(0).toUpperCase() + w.slice(1))
                              .join(' ');
 
+        const restaurantName = (req.body.restaurant && req.body.restaurant.trim()) ? req.body.restaurant.trim() : 'General Menu';
+        await saveRestaurant(restaurantName);
+
         const historyItem = {
             id: Date.now().toString(),
             name: modelName,
+            restaurant: restaurantName,
             glb: uploadedFiles.glb,
             usdz: uploadedFiles.usdz,
             viewerLink: viewerLink,
@@ -347,17 +353,85 @@ app.get('/api/config', (req, res) => {
     });
 });
 
+// Restaurant management helpers
+const restaurantsPath = path.join(__dirname, 'restaurants.json');
+
+async function getRestaurantsList() {
+    let list = [];
+    try {
+        const data = await fs.readFile(restaurantsPath, 'utf8');
+        list = JSON.parse(data);
+    } catch (e) {
+        list = [
+            { id: 'rest_general', name: 'General Menu', createdAt: new Date().toISOString() }
+        ];
+    }
+    return list;
+}
+
+async function saveRestaurant(name) {
+    if (!name || typeof name !== 'string') return null;
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+
+    let list = await getRestaurantsList();
+    const existing = list.find(r => r.name.toLowerCase() === trimmed.toLowerCase());
+    if (existing) return existing;
+
+    const newRest = {
+        id: 'rest_' + Date.now(),
+        name: trimmed,
+        createdAt: new Date().toISOString()
+    };
+    list.push(newRest);
+    try {
+        await fs.writeFile(restaurantsPath, JSON.stringify(list, null, 4), 'utf8');
+    } catch (err) {
+        console.error('Error writing restaurants.json:', err);
+    }
+    return newRest;
+}
+
+// Get all restaurants
+app.get('/api/restaurants', async (req, res) => {
+    try {
+        const restaurants = await getRestaurantsList();
+        res.json(restaurants);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch restaurants' });
+    }
+});
+
+// Create new restaurant
+app.post('/api/restaurants', async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name || !name.trim()) {
+            return res.status(400).json({ error: 'Restaurant name is required' });
+        }
+        const restaurant = await saveRestaurant(name);
+        const all = await getRestaurantsList();
+        res.json({ success: true, restaurant, restaurants: all });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create restaurant' });
+    }
+});
+
 // Register link endpoint (for links generated after direct client-side upload or optimization)
 app.post('/api/register-link', async (req, res) => {
     try {
-        const { name, glb, usdz } = req.body;
+        const { name, glb, usdz, restaurant } = req.body;
         if (!glb && !usdz) {
             return res.status(400).json({ error: 'No 3D model links provided' });
         }
+        const restaurantName = (restaurant && restaurant.trim()) ? restaurant.trim() : 'General Menu';
+        await saveRestaurant(restaurantName);
+
         const viewerLink = `/viewer.html?glb=${encodeURIComponent(glb || '')}&usdz=${encodeURIComponent(usdz || '')}`;
         const historyItem = {
             id: Date.now().toString(),
             name: name || 'Uploaded Dish',
+            restaurant: restaurantName,
             glb: glb || null,
             usdz: usdz || null,
             viewerLink: viewerLink,

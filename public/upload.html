@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload 3D Model - IdeateAR</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Upload 3D Food Model - IdeateAR Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #F05545;
             --primary-hover: #E63E3E;
-            --bg-color: #FAFAFA;
-            --text-color: #2D2D2D;
-            --border-color: #E1E1E1;
-            --shadow-color: rgba(240, 85, 69, 0.1);
+            --primary-light: rgba(240, 85, 69, 0.08);
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
             --card-bg: #FFFFFF;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
         }
 
         * {
@@ -23,7 +26,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -31,75 +34,234 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2rem;
+            padding: 2.5rem 1.5rem;
         }
 
         .logo {
             margin-bottom: 2rem;
-            width: 200px;
+            width: 170px;
             height: auto;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .logo:hover {
+            opacity: 0.85;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 760px;
             width: 100%;
             background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px var(--shadow-color);
+            padding: 2.75rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
         }
 
         .header {
-            text-align: center;
-            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.25rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
+        .header-content h1 {
+            font-size: 1.85rem;
+            color: var(--text-color);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.35rem;
+        }
+
+        .header-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.15rem;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-color);
             color: var(--primary-color);
-            margin-bottom: 0.75rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            background: var(--primary-light);
         }
 
-        .header p {
-            color: #666;
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
+        .nav-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2;
         }
 
-        .upload-container {
-            margin: 2rem 0;
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-label .optional {
+            font-weight: 400;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--text-color);
+            background: #FFFFFF;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(240, 85, 69, 0.12);
+        }
+
+        .restaurant-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .restaurant-row select {
+            flex: 1;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.75rem 1.15rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #FFFFFF;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-color);
+            border-color: var(--text-muted);
+        }
+
+        .btn-secondary svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .new-restaurant-container {
+            margin-top: 0.75rem;
+            padding: 1rem;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: none;
+            gap: 0.5rem;
+        }
+
+        .new-restaurant-container.active {
+            display: flex;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin: 1.75rem 0;
+        }
+
+        @media (max-width: 640px) {
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .upload-box {
-            border: 2px dashed var(--border-color);
-            border-radius: 16px;
-            padding: 2.5rem;
+            border: 1.5px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem 1.25rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
             background: var(--bg-color);
-            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
         }
 
         .upload-box:hover {
             border-color: var(--primary-color);
-            background: var(--card-bg);
-            transform: translateY(-2px);
+            background: var(--primary-light);
         }
 
         .upload-box.drag-over {
             border-color: var(--primary-color);
-            background: rgba(240, 85, 69, 0.05);
+            background: rgba(240, 85, 69, 0.1);
         }
 
-        .upload-icon {
-            font-size: 3.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1.25rem;
+        .upload-icon-svg {
+            width: 38px;
+            height: 38px;
+            stroke: var(--primary-color);
+            stroke-width: 1.75;
+            fill: none;
+            margin-bottom: 0.85rem;
+        }
+
+        .upload-box h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .upload-text {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            line-height: 1.4;
         }
 
         .file-input {
@@ -112,132 +274,77 @@
             cursor: pointer;
         }
 
-        .upload-box h3 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .upload-text {
-            margin: 1rem 0;
-            color: #666;
-            font-size: 1.1rem;
-        }
-
         .file-preview {
-            margin: 1.5rem 0;
-            padding: 1rem;
-            border-radius: 12px;
-            background: var(--bg-color);
+            width: 100%;
+            margin-top: 1rem;
             display: none;
-            border: 1px solid var(--border-color);
+            text-align: left;
         }
 
         .file-preview.active {
             display: block;
-            animation: fadeIn 0.3s ease;
         }
 
         .file-info {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem;
-            background: var(--card-bg);
+            padding: 0.65rem 0.85rem;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            margin: 0.5rem 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-size: 0.85rem;
         }
 
         .file-name {
-            font-size: 1rem;
+            font-weight: 600;
             color: var(--text-color);
-            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
         }
 
         .file-size {
-            color: #666;
-            font-size: 0.9rem;
-            background: var(--bg-color);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
         }
 
-        .submit-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 1.25rem 2.5rem;
-            font-size: 1.2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
+        .optimization-badge {
+            margin-top: 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: var(--success-light);
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+            border-radius: 6px;
+            font-size: 0.78rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .submit-btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow-color);
-        }
-
-        .submit-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .format-info {
-            margin-top: 2rem;
-            text-align: center;
-            font-size: 0.95rem;
-            color: #666;
-            padding: 1rem;
-            background: var(--bg-color);
-            border-radius: 12px;
-            line-height: 1.8;
-        }
-
-        .history-btn-wrapper {
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .history-link-btn {
             display: inline-flex;
             align-items: center;
-            background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            padding: 0.75rem 1.75rem;
-            font-size: 1rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            font-weight: 600;
-            text-decoration: none;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            width: 100%;
         }
 
-        .history-link-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow-color);
+        .optimizing-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #065F46;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .progress-bar {
             width: 100%;
             height: 6px;
-            background: var(--bg-color);
+            background: #E2E8F0;
             border-radius: 6px;
-            margin-top: 1.5rem;
+            margin: 1.5rem 0;
             overflow: hidden;
             display: none;
         }
@@ -250,108 +357,113 @@
             width: 0%;
             height: 100%;
             background: var(--primary-color);
-            transition: width 0.3s ease;
-            border-radius: 6px;
+            transition: width 0.25s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .upload-box {
-                padding: 1.5rem;
-            }
-
-            .logo {
-                width: 150px;
-            }
-        }
-
-        .optimization-badge {
-            margin-top: 0.5rem;
-            padding: 0.4rem 0.8rem;
-            background: #E8F5E9;
-            color: #2E7D32;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-flex;
+        .submit-btn {
+            background: var(--primary-color);
+            color: #FFFFFF;
+            border: none;
+            padding: 0.95rem 2rem;
+            font-size: 1.05rem;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            display: flex;
             align-items: center;
-            gap: 0.4rem;
+            justify-content: center;
+            gap: 0.6rem;
         }
 
-        .optimizing-spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid #2E7D32;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.8s linear infinite;
+        .submit-btn:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(240, 85, 69, 0.25);
+        }
+
+        .submit-btn:disabled {
+            background: #CBD5E1;
+            color: #94A3B8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .result-container {
             margin-top: 2rem;
-            padding: 2rem;
-            background: #FAFAFA;
-            border: 2px solid #4CAF50;
-            border-radius: 16px;
-            text-align: center;
+            padding: 1.75rem;
+            background: #FFFFFF;
+            border: 1px solid #10B981;
+            border-radius: 12px;
             display: none;
-            animation: fadeIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
         }
 
-        .result-title {
-            color: #2E7D32;
-            font-size: 1.4rem;
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #065F46;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            font-size: 1.15rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .result-header svg {
+            width: 22px;
+            height: 22px;
+            stroke: #10B981;
+        }
+
+        .result-desc {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-bottom: 1rem;
         }
 
         .result-link-box {
-            background: white;
-            padding: 0.8rem;
+            background: var(--bg-color);
+            padding: 0.75rem 1rem;
             border-radius: 8px;
-            border: 1px solid #ddd;
-            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.88rem;
+            color: var(--text-color);
             word-break: break-all;
-            font-family: monospace;
-            font-size: 0.95rem;
-            color: #333;
+            margin-bottom: 1.25rem;
         }
 
         .result-actions {
             display: flex;
-            gap: 1rem;
-            justify-content: center;
+            gap: 0.75rem;
             flex-wrap: wrap;
-            margin-top: 1rem;
         }
 
         .result-btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
             font-weight: 600;
             text-decoration: none;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border: 1px solid transparent;
+        }
+
+        .result-btn svg {
+            width: 16px;
+            height: 16px;
         }
 
         .result-btn-primary {
             background: var(--primary-color);
-            color: white;
+            color: #FFFFFF;
         }
 
         .result-btn-primary:hover {
@@ -359,41 +471,112 @@
         }
 
         .result-btn-secondary {
-            background: #e0e0e0;
-            color: #333;
+            background: #FFFFFF;
+            border-color: var(--border-color);
+            color: var(--text-color);
         }
 
         .result-btn-secondary:hover {
-            background: #d0d0d0;
+            background: var(--bg-color);
+        }
+
+        .format-info {
+            margin-top: 1.75rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.25rem;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1.5rem 1rem;
+            }
+            .container {
+                padding: 1.75rem 1.25rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .nav-btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <img src="/logo.png" alt="IdeateAR" class="logo">
+    <img src="/logo.png" alt="IdeateAR" class="logo" onclick="window.location.href='/'">
+    
     <div class="container">
         <div class="header">
-            <h1>Upload 3D Model</h1>
-            <p>Transform your menu items into immersive AR experiences with high-quality 3D models</p>
-            <div class="history-btn-wrapper">
-                <a href="/history.html" class="history-link-btn">
-                    📜 View Past AR Links
-                </a>
+            <div class="header-content">
+                <h1>Upload 3D Food Model</h1>
+                <p>Add photorealistic augmented reality dishes to restaurant menus</p>
             </div>
+            <a href="/history.html" class="nav-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                View AR Archive
+            </a>
         </div>
 
-        <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color);">Dish / Model Name (Optional)</label>
-                <input type="text" id="dishName" placeholder="e.g. Pepperoni Pizza" style="width: 100%; padding: 0.85rem 1rem; border: 1px solid var(--border-color); border-radius: 12px; font-size: 1rem; background: var(--bg-color);" />
+        <form id="uploadForm">
+            <!-- Restaurant Selection Group -->
+            <div class="form-group">
+                <label class="form-label" for="restaurantSelect">
+                    <span>Restaurant / Venue</span>
+                    <span class="optional">Required for organization</span>
+                </label>
+                <div class="restaurant-row">
+                    <select id="restaurantSelect" class="form-select">
+                        <option value="General Menu">General Menu</option>
+                    </select>
+                    <button type="button" class="btn-secondary" id="toggleNewRestBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        New Restaurant
+                    </button>
+                </div>
+                
+                <!-- Quick inline restaurant creation -->
+                <div class="new-restaurant-container" id="newRestContainer">
+                    <input type="text" id="newRestInput" class="form-input" placeholder="Enter new restaurant name..." />
+                    <button type="button" class="result-btn result-btn-primary" id="confirmNewRestBtn">Save</button>
+                    <button type="button" class="result-btn result-btn-secondary" id="cancelNewRestBtn">Cancel</button>
+                </div>
             </div>
 
-            <div class="upload-container">
-                <!-- GLB Upload -->
+            <!-- Dish Name Input -->
+            <div class="form-group">
+                <label class="form-label" for="dishName">
+                    <span>Dish / Item Name</span>
+                    <span class="optional">e.g. Margherita Pizza</span>
+                </label>
+                <input type="text" id="dishName" class="form-input" placeholder="e.g. Margherita Pizza" />
+            </div>
+
+            <!-- Upload Zones (GLB & USDZ) -->
+            <div class="upload-grid">
+                <!-- GLB Upload (Android / Web) -->
                 <div class="upload-box" id="glbUploadBox">
-                    <div class="upload-icon">📤</div>
+                    <svg class="upload-icon-svg" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
                     <h3>Upload GLB File</h3>
-                    <p class="upload-text">Drag and drop your GLB file here or click to browse</p>
+                    <p class="upload-text">Universal 3D format for Android, Web and Desktop</p>
                     <input type="file" name="glb" accept=".glb" class="file-input" id="glbInput">
                     <div class="file-preview" id="glbPreview">
                         <div class="file-info">
@@ -404,11 +587,14 @@
                     </div>
                 </div>
 
-                <!-- USDZ Upload -->
+                <!-- USDZ Upload (Apple iOS AR Quick Look) -->
                 <div class="upload-box" id="usdzUploadBox">
-                    <div class="upload-icon">📤</div>
+                    <svg class="upload-icon-svg" viewBox="0 0 24 24">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
                     <h3>Upload USDZ File</h3>
-                    <p class="upload-text">Drag and drop your USDZ file here or click to browse</p>
+                    <p class="upload-text">Apple AR Quick Look format for iPhone & iPad</p>
                     <input type="file" name="usdz" accept=".usdz" class="file-input" id="usdzInput">
                     <div class="file-preview" id="usdzPreview">
                         <div class="file-info">
@@ -418,30 +604,53 @@
                         <div id="usdzOptBadge" style="display: none;"></div>
                     </div>
                 </div>
-
-                <div class="progress-bar" id="progressBar">
-                    <div class="progress" id="progress"></div>
-                </div>
             </div>
 
-            <button type="submit" class="submit-btn" id="submitBtn" disabled>Upload Models</button>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                Upload Food Model
+            </button>
         </form>
 
         <!-- Result Box -->
         <div class="result-container" id="resultContainer">
-            <div class="result-title">🎉 AR Model Ready!</div>
-            <p style="color: #666; font-size: 0.95rem;">Your dish is optimized for lightning-fast loading (&lt;1s) even on low restaurant network.</p>
+            <div class="result-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>AR Food Model Ready</span>
+            </div>
+            <p class="result-desc" id="resultDesc">Optimized for sub-second restaurant network access.</p>
             <div class="result-link-box" id="resultLinkText"></div>
             <div class="result-actions">
-                <button class="result-btn result-btn-secondary" id="copyLinkBtn">📋 Copy Link</button>
-                <a href="#" target="_blank" class="result-btn result-btn-primary" id="openViewerBtn">👁️ Open AR Viewer</a>
-                <button class="result-btn result-btn-secondary" id="uploadAnotherBtn">➕ Upload Another</button>
+                <button type="button" class="result-btn result-btn-secondary" id="copyLinkBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Link
+                </button>
+                <a href="#" target="_blank" class="result-btn result-btn-primary" id="openViewerBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Launch AR Viewer
+                </a>
+                <button type="button" class="result-btn result-btn-secondary" id="uploadAnotherBtn">
+                    Upload Another Model
+                </button>
             </div>
         </div>
 
         <p class="format-info">
-            ⚡ <b>Low-Network Ready:</b> Models are automatically optimized in your browser to load in &lt;1 second on mobile networks.<br>
-            Supported formats: .GLB (3D models) and .USDZ (iOS AR Quick Look)
+            Low-Network Performance: Models are automatically optimized in-browser to load in under 1 second on mobile networks.<br>
+            Supported file formats: .GLB (glTF Binary) and .USDZ (Universal Scene Description).
         </p>
     </div>
 
@@ -449,17 +658,15 @@
         let preparedGlbFile = null;
         let preparedUsdzFile = null;
         
-        // Supabase project credentials (anon public key is designed for safe client-side browser direct uploads)
         const DEFAULT_SUPABASE_URL = 'https://gozuzgspptucveitionb.supabase.co';
         const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvenV6Z3NwcHR1Y3ZlaXRpb25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NzgxODcsImV4cCI6MjA5NTM1NDE4N30.PFR8LVfDykn7EkCmuYQYDFEGa4AAEazwzhNuf37xf38';
 
         let supabaseClient = null;
         if (window.supabase) {
             supabaseClient = window.supabase.createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_KEY);
-            console.log('Supabase client ready for direct cloud storage upload.');
         }
 
-        // Dynamically override if custom env vars are provided by server
+        // Fetch dynamic configuration
         fetch('/api/config')
             .then(res => res.json())
             .then(config => {
@@ -469,6 +676,71 @@
             })
             .catch(() => {});
 
+        // Load restaurants into dropdown
+        async function loadRestaurants(selectName) {
+            const select = document.getElementById('restaurantSelect');
+            try {
+                const res = await fetch('/api/restaurants');
+                if (res.ok) {
+                    const restaurants = await res.json();
+                    select.innerHTML = '';
+                    restaurants.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.name;
+                        opt.textContent = r.name;
+                        if (selectName && r.name.toLowerCase() === selectName.toLowerCase()) {
+                            opt.selected = true;
+                        }
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.warn('Could not load restaurants list:', err);
+            }
+        }
+
+        // Setup New Restaurant Inline Handler
+        const toggleNewRestBtn = document.getElementById('toggleNewRestBtn');
+        const newRestContainer = document.getElementById('newRestContainer');
+        const newRestInput = document.getElementById('newRestInput');
+        const confirmNewRestBtn = document.getElementById('confirmNewRestBtn');
+        const cancelNewRestBtn = document.getElementById('cancelNewRestBtn');
+
+        toggleNewRestBtn.addEventListener('click', () => {
+            newRestContainer.classList.toggle('active');
+            if (newRestContainer.classList.contains('active')) {
+                newRestInput.focus();
+            }
+        });
+
+        cancelNewRestBtn.addEventListener('click', () => {
+            newRestContainer.classList.remove('active');
+            newRestInput.value = '';
+        });
+
+        confirmNewRestBtn.addEventListener('click', async () => {
+            const name = newRestInput.value.trim();
+            if (!name) return;
+
+            confirmNewRestBtn.disabled = true;
+            try {
+                const res = await fetch('/api/restaurants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                if (res.ok) {
+                    await loadRestaurants(name);
+                    newRestContainer.classList.remove('active');
+                    newRestInput.value = '';
+                }
+            } catch (err) {
+                console.error('Failed to create restaurant:', err);
+            } finally {
+                confirmNewRestBtn.disabled = false;
+            }
+        });
+
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -477,21 +749,14 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // High-performance In-Browser GLB Optimizer (Texture downsampling & re-compression)
-        async function optimizeGLB(file, onProgress) {
+        // Texture compression in-browser for GLB models
+        async function optimizeGLB(file) {
             try {
-                if (file.size <= 2.5 * 1024 * 1024) {
-                    return file; // Already small enough for instant 1s load
-                }
+                if (file.size <= 2.5 * 1024 * 1024) return file;
 
-                if (onProgress) onProgress('Optimizing textures for &lt;1s load...');
                 const arrayBuffer = await file.arrayBuffer();
                 const dataView = new DataView(arrayBuffer);
-
-                // Verify GLB magic (0x46546C67 = 'glTF')
-                if (dataView.getUint32(0, true) !== 0x46546C67) {
-                    return file;
-                }
+                if (dataView.getUint32(0, true) !== 0x46546C67) return file;
 
                 const jsonChunkLength = dataView.getUint32(12, true);
                 const jsonBytes = new Uint8Array(arrayBuffer, 20, jsonChunkLength);
@@ -503,7 +768,6 @@
 
                 const binChunkLength = dataView.getUint32(binHeaderOffset, true);
                 const binData = new Uint8Array(arrayBuffer, binHeaderOffset + 8, binChunkLength);
-
                 if (!gltf.images || gltf.images.length === 0) return file;
 
                 const newImagesData = new Map();
@@ -520,7 +784,6 @@
                         const blob = new Blob([imgBytes], { type: img.mimeType || 'image/png' });
                         const bitmap = await createImageBitmap(blob);
 
-                        // Scale down to max 1024 for crisp mobile rendering with low weight
                         const maxDim = 1024;
                         let w = bitmap.width;
                         let h = bitmap.height;
@@ -547,16 +810,14 @@
                             img.mimeType = 'image/jpeg';
                         }
                     } catch (e) {
-                        console.warn('Could not compress texture image', i, e);
+                        console.warn('Could not compress texture', i, e);
                     }
                 }
 
                 if (newImagesData.size === 0) return file;
 
-                // Reconstruct Binary Chunk with aligned bufferViews
                 const chunks = [];
                 let currentOffset = 0;
-
                 for (let i = 0; i < gltf.bufferViews.length; i++) {
                     const bv = gltf.bufferViews[i];
                     const padding = (4 - (currentOffset % 4)) % 4;
@@ -585,17 +846,15 @@
                     chunks.push(new Uint8Array(binPadding));
                     currentOffset += binPadding;
                 }
-
                 gltf.buffers[0].byteLength = currentOffset;
 
-                // Encode padded JSON
                 let newJsonBytes = new TextEncoder().encode(JSON.stringify(gltf));
                 const jsonPadding = (4 - (newJsonBytes.byteLength % 4)) % 4;
                 if (jsonPadding > 0) {
                     const padded = new Uint8Array(newJsonBytes.byteLength + jsonPadding);
                     padded.set(newJsonBytes);
                     for (let p = 0; p < jsonPadding; p++) {
-                        padded[newJsonBytes.byteLength + p] = 0x20; // space padding
+                        padded[newJsonBytes.byteLength + p] = 0x20;
                     }
                     newJsonBytes = padded;
                 }
@@ -611,27 +870,22 @@
                 const finalBuffer = new Uint8Array(newTotalLength);
                 const finalView = new DataView(finalBuffer.buffer);
 
-                // Header
                 finalView.setUint32(0, 0x46546C67, true);
                 finalView.setUint32(4, 2, true);
                 finalView.setUint32(8, newTotalLength, true);
 
-                // JSON Chunk
                 finalView.setUint32(12, newJsonBytes.byteLength, true);
                 finalView.setUint32(16, 0x4E4F534A, true);
                 finalBuffer.set(newJsonBytes, 20);
 
-                // BIN Chunk
                 const binHeader = 20 + newJsonBytes.byteLength;
                 finalView.setUint32(binHeader, newBinChunk.byteLength, true);
                 finalView.setUint32(binHeader + 4, 0x004E4942, true);
                 finalBuffer.set(newBinChunk, binHeader + 8);
 
-                const optimizedFile = new File([finalBuffer], file.name, { type: 'model/gltf-binary' });
-                console.log(`GLB compressed in-browser: ${formatFileSize(file.size)} -> ${formatFileSize(optimizedFile.size)}`);
-                return optimizedFile;
+                return new File([finalBuffer], file.name, { type: 'model/gltf-binary' });
             } catch (err) {
-                console.warn('Error during in-browser GLB optimization, using original:', err);
+                console.warn('GLB optimization fallback:', err);
                 return file;
             }
         }
@@ -656,16 +910,16 @@
             if (file.size > 2.5 * 1024 * 1024) {
                 badge.style.display = 'inline-flex';
                 badge.className = 'optimization-badge';
-                badge.innerHTML = '<span class="optimizing-spinner"></span> Optimizing for fast &lt;1s restaurant loading...';
+                badge.innerHTML = '<span class="optimizing-spinner"></span> Optimizing for sub-second mobile rendering...';
                 
                 preparedGlbFile = await optimizeGLB(file);
                 
-                badge.innerHTML = `⚡ Optimized: ${formatFileSize(file.size)} ➔ <b>${formatFileSize(preparedGlbFile.size)}</b> (Loads in &lt;1s on mobile)`;
+                badge.innerHTML = `Optimized: ${formatFileSize(file.size)} → <b>${formatFileSize(preparedGlbFile.size)}</b> (Target: &lt;1s load)`;
             } else {
                 preparedGlbFile = file;
                 badge.style.display = 'inline-flex';
                 badge.className = 'optimization-badge';
-                badge.innerHTML = `⚡ Compact size (${formatFileSize(file.size)}) — Ready for instant loading`;
+                badge.innerHTML = `Compact file (${formatFileSize(file.size)}) — Ready for instant loading`;
             }
 
             updateSubmitButton();
@@ -691,7 +945,7 @@
 
             badge.style.display = 'inline-flex';
             badge.className = 'optimization-badge';
-            badge.innerHTML = `📱 iOS AR Quick Look model ready (${formatFileSize(file.size)})`;
+            badge.innerHTML = `Apple iOS AR Quick Look asset ready (${formatFileSize(file.size)})`;
 
             updateSubmitButton();
         }
@@ -701,7 +955,6 @@
             submitBtn.disabled = !(preparedGlbFile || preparedUsdzFile);
         }
 
-        // Drag & Drop Handlers
         ['glbUploadBox', 'usdzUploadBox'].forEach(boxId => {
             const box = document.getElementById(boxId);
             
@@ -736,7 +989,7 @@
             handleUsdzSelection(e.target.files[0]);
         });
 
-        // Form Submission
+        // Submit form
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const progressBar = document.getElementById('progressBar');
@@ -745,10 +998,11 @@
             const resultContainer = document.getElementById('resultContainer');
             const resultLinkText = document.getElementById('resultLinkText');
             const openViewerBtn = document.getElementById('openViewerBtn');
+            const resultDesc = document.getElementById('resultDesc');
 
             progressBar.classList.add('active');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Uploading...';
+            submitBtn.textContent = 'Processing & Uploading...';
             resultContainer.style.display = 'none';
 
             let progressVal = 10;
@@ -758,13 +1012,14 @@
                     progressVal += 10;
                     progress.style.width = progressVal + '%';
                 }
-            }, 150);
+            }, 120);
 
             try {
+                const restaurant = document.getElementById('restaurantSelect').value || 'General Menu';
                 const dishName = document.getElementById('dishName').value.trim() || 
                                 (preparedGlbFile ? preparedGlbFile.name.replace('.glb', '') : 'Dish Model');
 
-                // Case 1: Direct upload to Supabase Storage if configured (completely bypasses Vercel 4.5MB limit)
+                // Path 1: Direct Cloud Storage (Supabase)
                 if (supabaseClient) {
                     submitBtn.textContent = 'Uploading to Cloud Storage...';
                     let glbUrl = null;
@@ -800,7 +1055,7 @@
                             const regRes = await fetch('/api/register-link', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ name: dishName, glb: glbUrl, usdz: usdzUrl })
+                                body: JSON.stringify({ name: dishName, glb: glbUrl, usdz: usdzUrl, restaurant })
                             });
                             if (regRes.ok) {
                                 const regData = await regRes.json();
@@ -808,27 +1063,25 @@
                                     viewerLink = regData.viewerLink;
                                 }
                             }
-                        } catch (regErr) {
-                            console.warn('Could not register to history, but viewer link is generated:', regErr);
+                        } catch (err) {
+                            console.warn('Registration fallback:', err);
                         }
-                        displaySuccess(viewerLink);
+                        displaySuccess(viewerLink, restaurant, dishName);
                         return;
                     }
                 }
 
-                // Case 2: Server POST upload (only if files are within 4MB limit)
+                // Path 2: Standard Serverless Upload
                 const totalSize = (preparedGlbFile ? preparedGlbFile.size : 0) + (preparedUsdzFile ? preparedUsdzFile.size : 0);
                 if (totalSize > 4.2 * 1024 * 1024) {
-                    throw new Error('Direct cloud storage was unavailable and total file size (' + formatFileSize(totalSize) + ') exceeds serverless 4.5MB limit.');
+                    throw new Error('Total file size (' + formatFileSize(totalSize) + ') exceeds host limit. Please ensure models are compressed under 4MB.');
                 }
 
                 const formData = new FormData();
-                if (preparedGlbFile) {
-                    formData.append('glb', preparedGlbFile);
-                }
-                if (preparedUsdzFile) {
-                    formData.append('usdz', preparedUsdzFile);
-                }
+                if (preparedGlbFile) formData.append('glb', preparedGlbFile);
+                if (preparedUsdzFile) formData.append('usdz', preparedUsdzFile);
+                formData.append('restaurant', restaurant);
+                formData.append('name', dishName);
 
                 const response = await fetch('/upload', {
                     method: 'POST',
@@ -836,36 +1089,37 @@
                 });
 
                 if (response.status === 413) {
-                    throw new Error('Request payload too large. Please use models under 4MB or check cloud storage connection.');
+                    throw new Error('Request payload too large. Please use models under 4MB.');
                 }
 
                 const responseText = await response.text();
                 const match = responseText.match(/href="([^"]+)"/);
                 const viewerLink = match ? match[1] : '/viewer.html';
-                displaySuccess(viewerLink);
+                displaySuccess(viewerLink, restaurant, dishName);
 
             } catch (error) {
                 console.error('Upload Error:', error);
                 clearInterval(progressTimer);
                 progressBar.classList.remove('active');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Upload Models';
-                alert('Upload issue: ' + (error.message || 'Please check your connection and file sizes.'));
+                submitBtn.textContent = 'Upload Food Model';
+                alert('Upload issue: ' + (error.message || 'Please check your connection and try again.'));
             }
 
-            function displaySuccess(link) {
+            function displaySuccess(link, restName, dish) {
                 clearInterval(progressTimer);
                 progress.style.width = '100%';
                 setTimeout(() => {
                     progressBar.classList.remove('active');
                 }, 400);
 
-                submitBtn.textContent = 'Uploaded Successfully!';
+                submitBtn.textContent = 'Uploaded Successfully';
                 submitBtn.disabled = true;
 
                 const fullUrl = window.location.origin + link;
                 resultLinkText.textContent = fullUrl;
                 openViewerBtn.href = fullUrl;
+                resultDesc.textContent = `Assigned to ${restName} — Ready for instant mobile AR viewing.`;
                 resultContainer.style.display = 'block';
                 resultContainer.scrollIntoView({ behavior: 'smooth' });
             }
@@ -875,9 +1129,10 @@
             const link = document.getElementById('resultLinkText').textContent;
             navigator.clipboard.writeText(link).then(() => {
                 const btn = document.getElementById('copyLinkBtn');
-                btn.textContent = '✅ Copied!';
+                const orig = btn.innerHTML;
+                btn.textContent = 'Copied to Clipboard';
                 setTimeout(() => {
-                    btn.textContent = '📋 Copy Link';
+                    btn.innerHTML = orig;
                 }, 2000);
             });
         });
@@ -890,10 +1145,13 @@
             preparedGlbFile = null;
             preparedUsdzFile = null;
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.textContent = 'Upload Models';
+            submitBtn.textContent = 'Upload Food Model';
             submitBtn.disabled = true;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // Initialize restaurants on load
+        document.addEventListener('DOMContentLoaded', () => loadRestaurants());
     </script>
 </body>
 </html>
