@@ -153,6 +153,13 @@ h6,
   overflow: hidden;
   white-space: nowrap;
   /* Prevent breaking into two lines on small screens */
+  margin-top: -3rem;
+}
+
+@media (max-width: 900px) {
+  .experience-btn {
+    margin-top: 2rem;
+  }
 }
 
 .experience-btn::before {
@@ -215,18 +222,32 @@ h6,
 }
 
 .hero-content {
-  text-align: center;
+  text-align: left;
   margin-bottom: 3rem;
   z-index: 2;
+  width: 100%;
+  max-width: 1400px;
+  padding: 0 2rem;
 }
 
 .hero-subtitle {
   font-size: clamp(1rem, 1.5vw, 1.3rem);
   max-width: 500px;
-  margin: 1rem auto 0;
+  margin: 1rem 0 0;
   font-weight: 500;
   color: var(--text-white);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 900px) {
+  .hero-content {
+    padding: 0 1rem;
+    margin-bottom: 12rem;
+    text-align: center;
+  }
+  .hero-subtitle {
+    margin: 1rem auto 0;
+  }
 }
 
 /* Hero Split Layout */
@@ -682,5 +703,289 @@ h6,
 
   100% {
     transform: translateY(-36rem);
+  }
+}
+
+@keyframes slideUpSquare {
+  0%,
+  12% {
+    transform: translateY(0);
+  }
+
+  16.66%,
+  28% {
+    transform: translateY(-300px);
+  }
+
+  33.33%,
+  45% {
+    transform: translateY(-600px);
+  }
+
+  50%,
+  62% {
+    transform: translateY(-900px);
+  }
+
+  66.66%,
+  79% {
+    transform: translateY(-1200px);
+  }
+
+  83.33%,
+  95% {
+    transform: translateY(-1500px);
+  }
+
+  100% {
+    transform: translateY(-1800px);
+  }
+}
+
+/* Interactive Carousel Section */
+.eyes-carousel-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.carousel-track-container {
+  overflow: hidden;
+  width: 100%;
+  max-width: 500px;
+  height: 250px;
+  position: relative;
+  border-radius: 30px;
+}
+
+.carousel-track {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateX(50px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.carousel-slide.prev-slide {
+  transform: translateX(-50px) scale(0.95);
+}
+
+.carousel-card {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(235, 71, 61, 0.4);
+  border-radius: 30px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 0 20px rgba(235, 71, 61, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.carousel-card:hover {
+  border-color: rgba(235, 71, 61, 0.8);
+  box-shadow: 
+    0 25px 50px rgba(235, 71, 61, 0.15),
+    inset 0 0 25px rgba(235, 71, 61, 0.1);
+  transform: scale(1.02);
+}
+
+.card-icon-svg {
+  width: 4rem;
+  height: 4rem;
+  color: var(--text-white);
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+  transition: all 0.3s ease;
+}
+
+/* Red accent on card hover */
+.carousel-card:hover .card-icon-svg {
+  color: var(--bg-red);
+  filter: drop-shadow(0 0 15px rgba(235, 71, 61, 0.6));
+  transform: scale(1.1);
+}
+
+.carousel-card h3 {
+  font-family: "Outfit", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-white);
+  line-height: 1.3;
+}
+
+/* Navigation Buttons */
+.carousel-btn {
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-white);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.carousel-btn svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  transition: transform 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: var(--bg-red);
+  border-color: var(--bg-red);
+  transform: scale(1.1);
+  box-shadow: 0 15px 25px rgba(235, 71, 61, 0.4);
+}
+
+.carousel-btn:active {
+  transform: scale(0.95);
+}
+
+.prev-btn:hover svg {
+  transform: translateX(-2px);
+}
+
+.next-btn:hover svg {
+  transform: translateX(2px);
+}
+
+/* Indicators */
+.carousel-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.carousel-indicator {
+  border: 0;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-indicator.active {
+  background: var(--bg-red);
+  width: 30px;
+  border-radius: 10px;
+}
+
+/* Responsive adjustment */
+@media (max-width: 600px) {
+  .carousel-wrapper {
+    gap: 0.5rem;
+  }
+  .carousel-btn {
+    width: 45px;
+    height: 45px;
+  }
+  .carousel-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .carousel-track-container {
+    height: 220px;
+  }
+  .carousel-card h3 {
+    font-size: 1.3rem;
+  }
+  .card-icon {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Mobile responsive sizing for the home page */
+@media (max-width: 600px) {
+  /* Prevent IDEATEAR from wrapping, keep it left-aligned */
+  .impactful-heading {
+    font-size: clamp(2.4rem, 12vw, 3.8rem) !important; /* gorgeous standard size on mobile */
+    white-space: nowrap !important;
+    text-align: left !important;
+  }
+  
+  /* Left-align hero content, adjust bottom margin */
+  .hero-content {
+    text-align: left !important;
+    padding: 0 1rem !important;
+    margin-bottom: 2rem !important;
+    width: 100% !important;
+  }
+  
+  /* Left-align the subtitle */
+  .hero-subtitle {
+    text-align: left !important;
+    margin: 1rem 0 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Reduce the size of the main pizza 3D model box */
+  .squircle-container {
+    height: 35vh !important;
+    min-height: 250px !important;
+    border-radius: 25px !important;
+  }
+
+  /* Reduce the size of the EXPLORE NOW button */
+  .experience-btn {
+    font-size: 1.3rem !important;
+    padding: 1rem 2.8rem !important;
+    margin-top: 2rem !important;
   }
 }

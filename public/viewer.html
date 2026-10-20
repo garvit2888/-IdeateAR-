@@ -214,6 +214,8 @@
         const params = new URLSearchParams(window.location.search);
         const glb = params.get('glb');
         const usdz = params.get('usdz');
+        const isFallback = params.get('fallback') === 'true';
+        
         const modelViewer = document.getElementById('modelViewer');
         const arButton = document.getElementById('arButton');
         const loadingContainer = document.getElementById('loadingContainer');
@@ -228,78 +230,60 @@
             return /Android/.test(navigator.userAgent);
         }
 
-        // Hide loading immediately since we're not showing the model
-        loadingContainer.style.display = 'none';
-        progressBar.style.display = 'none';
+        // Setup the interactive 3D viewer backdrop (for Desktop/Fallbacks/iOS close-out)
+        if (glb && glb !== 'null') {
+            modelViewer.src = glb;
+            modelViewer.style.display = 'block';
+            
+            // Handle loading progress
+            modelViewer.addEventListener('progress', (e) => {
+                const percent = e.detail.totalProgress * 100;
+                progressBar.querySelector('.progress').style.width = `${percent}%`;
+            });
 
-        // Set up AR experience based on device
-        if (isIOS()) {
-            if (usdz && usdz !== 'null') {
-                arLink.href = usdz;
-                arButton.style.display = 'flex';
-                arButton.onclick = (e) => {
-                    e.preventDefault();
-                    arLink.click();
-                };
-            }
-        } else if (isAndroid()) {
-            if (glb && glb !== 'null') {
-                // Set up model-viewer but keep it hidden
-                modelViewer.src = glb;
-                arButton.style.display = 'flex';
-                arButton.onclick = () => {
-                    // Show brief loading state
-                    loadingContainer.style.display = 'flex';
-                    
-                    // Attempt to activate AR
-                    try {
-                        modelViewer.activateAR();
-                    } catch (error) {
-                        loadingContainer.innerHTML = `
-                            <div style="text-align: center; padding: 2rem;">
-                                <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Unable to Launch AR</h2>
-                                <p style="color: var(--text-color);">Please ensure AR is supported on your device.</p>
-                            </div>
-                        `;
-                    }
-                    
-                    // Hide loading after a short delay
-                    setTimeout(() => {
-                        loadingContainer.style.display = 'none';
-                    }, 2000);
-                };
+            modelViewer.addEventListener('load', () => {
+                loadingContainer.classList.add('hidden');
+                progressBar.style.display = 'none';
+            });
+        } else {
+            loadingContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <h2 style="color: var(--primary-color); margin-bottom: 1rem;">No Model Specified</h2>
+                    <p style="color: var(--text-color);">Please check the link and try again.</p>
+                </div>
+            `;
+        }
+
+        // Automated WebAR Redirection / Launching
+        if (!isFallback) {
+            if (isIOS() && usdz && usdz !== 'null') {
+                // iOS: Instantly trigger native Apple AR Quick Look
+                window.location.replace(usdz);
+            } else if (isAndroid() && glb && glb !== 'null') {
+                // Android: Instantly launch native Google Scene Viewer
+                // Fallback URL redirects back here with ?fallback=true if ARCore is not installed
+                const currentUrl = window.location.href + '&fallback=true';
+                const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(glb)}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(currentUrl)};end;`;
+                window.location.replace(sceneViewerUrl);
+            } else if (!isIOS() && !isAndroid()) {
+                // Desktop: Already showing the premium 3D viewer model, hide loading after load event
             }
         } else {
-            // Desktop experience - show a message
-            arButton.style.display = 'flex';
-            arButton.textContent = 'View on Mobile for AR';
-            arButton.style.opacity = '0.7';
-            arButton.style.cursor = 'not-allowed';
-            arButton.disabled = true;
+            // Reached here via Android fallback: hide loading so they can interact in 3D
+            loadingContainer.classList.add('hidden');
+            progressBar.style.display = 'none';
         }
 
         // Handle model viewer errors
         modelViewer.addEventListener('error', () => {
             loadingContainer.innerHTML = `
                 <div style="text-align: center; padding: 2rem;">
-                    <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Unable to Load AR</h2>
-                    <p style="color: var(--text-color);">Please try again or check device compatibility.</p>
+                    <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Unable to Load Model</h2>
+                    <p style="color: var(--text-color);">Please try again or check your network.</p>
                 </div>
             `;
+            loadingContainer.classList.remove('hidden');
             loadingContainer.style.display = 'flex';
-        });
-
-        // Handle AR mode change
-        modelViewer.addEventListener('ar-status', (event) => {
-            if (event.detail.status === 'failed') {
-                loadingContainer.innerHTML = `
-                    <div style="text-align: center; padding: 2rem;">
-                        <h2 style="color: var(--primary-color); margin-bottom: 1rem;">AR Launch Failed</h2>
-                        <p style="color: var(--text-color);">Please ensure AR is supported on your device.</p>
-                    </div>
-                `;
-                loadingContainer.style.display = 'flex';
-            }
         });
     </script>
 </body>

@@ -1,0 +1,10 @@
+# Ignore local uploads
+public/uploads/
+
+# Standard ignores
+node_modules/
+.env
+.env.*
+.git/
+.vercel/
+*.log

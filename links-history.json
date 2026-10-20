@@ -1,0 +1,34 @@
+[
+    {
+        "id": "1779784390602",
+        "name": "1748354778450",
+        "glb": "https://gozuzgspptucveitionb.supabase.co/storage/v1/object/public/models/1779784345001-1748354778450.glb",
+        "usdz": "https://gozuzgspptucveitionb.supabase.co/storage/v1/object/public/models/1779784345001-1748354778450.usdz",
+        "viewerLink": "/viewer.html?glb=https://gozuzgspptucveitionb.supabase.co/storage/v1/object/public/models/1779784345001-1748354778450.glb&usdz=https://gozuzgspptucveitionb.supabase.co/storage/v1/object/public/models/1779784345001-1748354778450.usdz",
+        "createdAt": "2026-05-26T08:33:10.602Z"
+    },
+    {
+        "id": "1779783798772",
+        "name": "1748354778450",
+        "glb": "/uploads/1779783747469-1748354778450.glb",
+        "usdz": "/uploads/1779783747469-1748354778450.usdz",
+        "viewerLink": "/viewer.html?glb=/uploads/1779783747469-1748354778450.glb&usdz=/uploads/1779783747469-1748354778450.usdz",
+        "createdAt": "2026-05-26T08:23:18.772Z"
+    },
+    {
+        "id": "1779780084706",
+        "name": "1748072340838",
+        "glb": "/uploads/1779780084666-1748072340838.glb",
+        "usdz": "/uploads/1779780084666-1748072340838.usdz",
+        "viewerLink": "/viewer.html?glb=/uploads/1779780084666-1748072340838.glb&usdz=/uploads/1779780084666-1748072340838.usdz",
+        "createdAt": "2026-05-26T07:21:24.706Z"
+    },
+    {
+        "id": "1779780011869",
+        "name": "Dummy",
+        "glb": "/uploads/1779780011868-dummy.glb",
+        "usdz": "/uploads/1779780011868-dummy.usdz",
+        "viewerLink": "/viewer.html?glb=/uploads/1779780011868-dummy.glb&usdz=/uploads/1779780011868-dummy.usdz",
+        "createdAt": "2026-05-26T07:20:11.869Z"
+    }
+]

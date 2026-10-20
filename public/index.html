@@ -13,6 +13,9 @@
         rel="stylesheet" />
     <!-- Styles -->
     <link rel="stylesheet" href="./style.css" />
+    <!-- Preload 3D Model & Poster for < 1s load in low network / restaurant environments -->
+    <link rel="preload" href="./pizza.glb" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="./pizza-poster.jpg" as="image" />
     <!-- Model Viewer for AR/3D -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 </head>
@@ -61,7 +64,8 @@
                 For the 3D model to be visible on desktop browsers (Chrome, Edge, Safari on Mac) 
                 or Android devices, you MUST also provide a .glb version.
                 -->
-                <model-viewer class="pizza-model" src="./pizza.glb" ios-src="./pizza.usdz" alt="A 3D model of a pizza"
+                <model-viewer id="hero-model" class="pizza-model" src="./pizza.glb" ios-src="./pizza.usdz" alt="A 3D model of a pizza"
+                    poster="./pizza-poster.jpg" seamless-poster loading="eager" reveal="auto"
                     auto-rotate rotation-per-second="30deg" camera-controls camera-orbit="0deg 45deg 105%" ar
                     shadow-intensity="1">
                     <div class="prompt-text" slot="poster">
@@ -69,19 +73,19 @@
                     </div>
                 </model-viewer>
             </div>
-
+ 
             <div class="hero-actions">
                 <a href="#experience" class="experience-btn">EXPLORE NOW</a>
             </div>
         </div>
-
+ 
         <!-- Discreet Admin Access -->
         <a href="/upload.html" class="admin-link">Admin Access</a>
     </main>
-
+ 
     <!-- Overlay for Warp Transition -->
     <div class="warp-overlay" id="warp-overlay"></div>
-
+ 
     <!-- Explore Section (What we do & Integration Process) -->
     <section class="explore-section" id="explore-section">
         <div class="explore-content">
@@ -100,10 +104,27 @@
                         smartphones. This technology allows customers to view dishes in
                         3D, ensuring better decision-making.
                     </p>
+ 
+                    <!-- Nesting Benefits Box below the description -->
+                    <div class="benefits-squircle nested-benefits"
+                        style="margin-top: 2rem; border-radius: 40px; width: 300px; height: 300px; overflow: hidden; position: relative;">
+                        <div class="sliding-text-wrapper" style="height: 300px; padding: 0;">
+                            <ul class="sliding-text-list" id="sliding-text-list"
+                                style="animation: slideUpSquare 12s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite; height: 100%;">
+                                <li style="height: 300px; font-size: 1.2rem;">Stand Out From Competitors</li>
+                                <li style="height: 300px; font-size: 1.2rem;">Eliminate Customer Disappointment</li>
+                                <li style="height: 300px; font-size: 1.2rem;">Increase Average Order Value</li>
+                                <li style="height: 300px; font-size: 1.2rem;">Better Experience = Better Reviews</li>
+                                <li style="height: 300px; font-size: 1.2rem;">Future-Proof Your Restaurant</li>
+                                <li style="height: 300px; font-size: 1.2rem;">Boost Customer Engagement</li>
+                                <li style="height: 300px; font-size: 1.2rem;">Stand Out From Competitors</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-
-                <!-- New Right Side Animated Squircle -->
-                <div class="squircle-container benefits-squircle fade-in-up floating-animation" style="
+ 
+                <!-- Right Side Autoplaying Video -->
+                <div class="benefits-squircle fade-in-up" style="
               flex: 1;
               min-width: 300px;
               display: flex;
@@ -111,18 +132,92 @@
               justify-content: center;
               position: relative;
               animation-delay: 0.2s;
+              padding: 0; /* Remove padding to let video fill the squircle */
             ">
-                    <div class="sliding-text-wrapper">
-                        <ul class="sliding-text-list" id="sliding-text-list">
-                            <li>Stand Out From Competitors</li>
-                            <li>Eliminate Customer Disappointment</li>
-                            <li>Increase Average Order Value</li>
-                            <li>Better Experience = Better Reviews</li>
-                            <li>Future-Proof Your Restaurant</li>
-                            <li>Boost Customer Engagement</li>
-                            <!-- First item repeated to create a seamless loop effect -->
-                            <li>Stand Out From Competitors</li>
-                        </ul>
+                    <video autoplay loop muted playsinline
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 40px;">
+                        <source src="./demo.mp4" type="video/mp4" />
+                        <source src="./demo.mov" type="video/quicktime" />
+                        <!-- Fallback text if the browser doesn't support the video format -->
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+
+            <!-- People Eat With Their Eyes Section -->
+            <div class="eyes-section-container fade-in-up" style="animation-delay: 0.1s">
+                <h2 class="section-title">People Eat With Their Eyes.</h2>
+                <p class="section-description" style="margin-bottom: 3rem;">
+                    In 2026, modern diners browse before they bite. Show them your food in its best light, right as they’re deciding what to order.
+                </p>
+
+                <!-- Interactive Carousel -->
+                <div class="eyes-carousel-container">
+                    <div class="carousel-wrapper">
+                        <button class="carousel-btn prev-btn" aria-label="Previous slide" onclick="moveCarousel(-1)">
+                            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                        </button>
+                        
+                        <div class="carousel-track-container">
+                            <ul class="carousel-track">
+                                <li class="carousel-slide active">
+                                    <div class="carousel-card">
+                                        <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                            <polyline points="17 6 23 6 23 12"></polyline>
+                                        </svg>
+                                        <h3>Increased average order value</h3>
+                                    </div>
+                                </li>
+                                <li class="carousel-slide">
+                                    <div class="carousel-card">
+                                        <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                        <h3>Better customer experience</h3>
+                                    </div>
+                                </li>
+                                <li class="carousel-slide">
+                                    <div class="carousel-card">
+                                        <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                            <circle cx="12" cy="13" r="4"></circle>
+                                        </svg>
+                                        <h3>More Instagram-worthy dining</h3>
+                                    </div>
+                                </li>
+                                <li class="carousel-slide">
+                                    <div class="carousel-card">
+                                        <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        <h3>Fewer customer complaints</h3>
+                                    </div>
+                                </li>
+                                <li class="carousel-slide">
+                                    <div class="carousel-card">
+                                        <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path>
+                                            <path d="M5 20h14"></path>
+                                        </svg>
+                                        <h3>Competitive differentiation</h3>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <button class="carousel-btn next-btn" aria-label="Next slide" onclick="moveCarousel(1)">
+                            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Indicators -->
+                    <div class="carousel-nav">
+                        <button class="carousel-indicator active" onclick="setSlide(0)"></button>
+                        <button class="carousel-indicator" onclick="setSlide(1)"></button>
+                        <button class="carousel-indicator" onclick="setSlide(2)"></button>
+                        <button class="carousel-indicator" onclick="setSlide(3)"></button>
+                        <button class="carousel-indicator" onclick="setSlide(4)"></button>
                     </div>
                 </div>
             </div>
@@ -170,13 +265,36 @@
                 <!-- Contact Us Button -->
                 <div class="action-wrapper fade-in-up" style="
               display: flex;
-              justify-content: center;
+              flex-direction: column;
+              align-items: center;
               margin-top: 5rem;
+              gap: 1.5rem;
               animation-delay: 0.4s;
             ">
-                    <button class="interested-btn" style="padding: 1.5rem 5rem; font-size: 1.5rem; font-weight: 900">
-                        CONTACT US
+                    <button class="interested-btn" onclick="window.location.href='mailto:reach.ideatear@gmail.com'"
+                        style="padding: 1.5rem 5rem; font-size: 1.5rem; font-weight: 900">
+                        JOIN THE QUE!
                     </button>
+                    <a href="https://drive.google.com/file/d/1JP3jv8VrenekifSWBxpfWESGNZ5PXt1v/view?usp=share_link" 
+                       target="_blank" 
+                       class="sample-menu-link" 
+                       style="
+                           font-family: 'Outfit', sans-serif;
+                           font-weight: 700;
+                           font-size: 1.2rem;
+                           color: rgba(255, 255, 255, 0.6);
+                           text-decoration: none;
+                           text-transform: uppercase;
+                           letter-spacing: 2px;
+                           transition: all 0.3s ease;
+                           border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+                           padding-bottom: 5px;
+                       "
+                       onmouseover="this.style.color='#ffffff'; this.style.borderColor='var(--bg-red)';"
+                       onmouseout="this.style.color='rgba(255, 255, 255, 0.6)'; this.style.borderColor='rgba(255, 255, 255, 0.2)';"
+                    >
+                        VIEW SAMPLE MENU
+                    </a>
                 </div>
             </div>
         </div>
@@ -235,6 +353,68 @@
                 }, 800);
             }, 800); // Matches the warp animation duration
         });
+
+        // Carousel Logic
+        let currentSlide = 0;
+        const slides = document.querySelectorAll(".carousel-slide");
+        const indicators = document.querySelectorAll(".carousel-indicator");
+
+        function showSlide(index) {
+            if (index >= slides.length) {
+                currentSlide = 0;
+            } else if (index < 0) {
+                currentSlide = slides.length - 1;
+            } else {
+                currentSlide = index;
+            }
+
+            slides.forEach((slide, i) => {
+                slide.classList.remove("active", "prev-slide");
+                if (i === currentSlide) {
+                    slide.classList.add("active");
+                } else if (i === (currentSlide - 1 + slides.length) % slides.length) {
+                    slide.classList.add("prev-slide");
+                }
+            });
+
+            indicators.forEach((indicator, i) => {
+                if (i === currentSlide) {
+                    indicator.classList.add("active");
+                } else {
+                    indicator.classList.remove("active");
+                }
+            });
+        }
+
+        window.moveCarousel = function(direction) {
+            showSlide(currentSlide + direction);
+        };
+
+        window.setSlide = function(index) {
+            showSlide(index);
+        };
+
+        // Fallback to local pizza model if any 3D model fails to load
+        document.querySelectorAll('model-viewer').forEach(viewer => {
+            viewer.addEventListener('error', (e) => {
+                console.warn(`Failed to load 3D model: ${viewer.src}. Falling back to local pizza model.`);
+                const currentSrc = viewer.getAttribute('src') || '';
+                if (!currentSrc.includes('pizza.glb')) {
+                    viewer.setAttribute('src', './pizza.glb');
+                    viewer.setAttribute('ios-src', './pizza.usdz');
+                    viewer.setAttribute('alt', 'A 3D model of a pizza (fallback)');
+                }
+            });
+        });
+
+        // Ensure autoplay video plays reliably across all browsers
+        const demoVideo = document.querySelector('.benefits-squircle video');
+        if (demoVideo) {
+            demoVideo.muted = true;
+            demoVideo.play().catch(err => {
+                console.log('Video autoplay handled:', err);
+            });
+        }
     </script>
 </body>
 

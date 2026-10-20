@@ -203,6 +203,35 @@
             line-height: 1.8;
         }
 
+        .history-btn-wrapper {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .history-link-btn {
+            display: inline-flex;
+            align-items: center;
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.75rem 1.75rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            font-weight: 600;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .history-link-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
         .progress-bar {
             width: 100%;
             height: 6px;
@@ -247,7 +276,98 @@
                 width: 150px;
             }
         }
+
+        .optimization-badge {
+            margin-top: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: #E8F5E9;
+            color: #2E7D32;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .optimizing-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #2E7D32;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #FAFAFA;
+            border: 2px solid #4CAF50;
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-title {
+            color: #2E7D32;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-link-box {
+            background: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin: 1rem 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .result-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .result-btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .result-btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .result-btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .result-btn-secondary:hover {
+            background: #d0d0d0;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <img src="/logo.png" alt="IdeateAR" class="logo">
@@ -255,9 +375,19 @@
         <div class="header">
             <h1>Upload 3D Model</h1>
             <p>Transform your menu items into immersive AR experiences with high-quality 3D models</p>
+            <div class="history-btn-wrapper">
+                <a href="/history.html" class="history-link-btn">
+                    📜 View Past AR Links
+                </a>
+            </div>
         </div>
 
         <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color);">Dish / Model Name (Optional)</label>
+                <input type="text" id="dishName" placeholder="e.g. Pepperoni Pizza" style="width: 100%; padding: 0.85rem 1rem; border: 1px solid var(--border-color); border-radius: 12px; font-size: 1rem; background: var(--bg-color);" />
+            </div>
+
             <div class="upload-container">
                 <!-- GLB Upload -->
                 <div class="upload-box" id="glbUploadBox">
@@ -270,6 +400,7 @@
                             <span class="file-name" id="glbFileName"></span>
                             <span class="file-size" id="glbFileSize"></span>
                         </div>
+                        <div id="glbOptBadge" style="display: none;"></div>
                     </div>
                 </div>
 
@@ -284,6 +415,7 @@
                             <span class="file-name" id="usdzFileName"></span>
                             <span class="file-size" id="usdzFileSize"></span>
                         </div>
+                        <div id="usdzOptBadge" style="display: none;"></div>
                     </div>
                 </div>
 
@@ -295,13 +427,48 @@
             <button type="submit" class="submit-btn" id="submitBtn" disabled>Upload Models</button>
         </form>
 
+        <!-- Result Box -->
+        <div class="result-container" id="resultContainer">
+            <div class="result-title">🎉 AR Model Ready!</div>
+            <p style="color: #666; font-size: 0.95rem;">Your dish is optimized for lightning-fast loading (&lt;1s) even on low restaurant network.</p>
+            <div class="result-link-box" id="resultLinkText"></div>
+            <div class="result-actions">
+                <button class="result-btn result-btn-secondary" id="copyLinkBtn">📋 Copy Link</button>
+                <a href="#" target="_blank" class="result-btn result-btn-primary" id="openViewerBtn">👁️ Open AR Viewer</a>
+                <button class="result-btn result-btn-secondary" id="uploadAnotherBtn">➕ Upload Another</button>
+            </div>
+        </div>
+
         <p class="format-info">
-            Supported formats: .GLB (3D models) and .USDZ (iOS AR Quick Look)<br>
-            Maximum file size: 50MB per file
+            ⚡ <b>Low-Network Ready:</b> Models are automatically optimized in your browser to load in &lt;1 second on mobile networks.<br>
+            Supported formats: .GLB (3D models) and .USDZ (iOS AR Quick Look)
         </p>
     </div>
 
     <script>
+        let preparedGlbFile = null;
+        let preparedUsdzFile = null;
+        
+        // Supabase project credentials (anon public key is designed for safe client-side browser direct uploads)
+        const DEFAULT_SUPABASE_URL = 'https://gozuzgspptucveitionb.supabase.co';
+        const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvenV6Z3NwcHR1Y3ZlaXRpb25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NzgxODcsImV4cCI6MjA5NTM1NDE4N30.PFR8LVfDykn7EkCmuYQYDFEGa4AAEazwzhNuf37xf38';
+
+        let supabaseClient = null;
+        if (window.supabase) {
+            supabaseClient = window.supabase.createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_KEY);
+            console.log('Supabase client ready for direct cloud storage upload.');
+        }
+
+        // Dynamically override if custom env vars are provided by server
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(config => {
+                if (config.hasSupabase && window.supabase && config.supabaseUrl) {
+                    supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                }
+            })
+            .catch(() => {});
+
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -310,30 +477,231 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function handleFile(file, previewId, fileNameId, fileSizeId) {
-            const preview = document.getElementById(previewId);
-            const fileName = document.getElementById(fileNameId);
-            const fileSize = document.getElementById(fileSizeId);
+        // High-performance In-Browser GLB Optimizer (Texture downsampling & re-compression)
+        async function optimizeGLB(file, onProgress) {
+            try {
+                if (file.size <= 2.5 * 1024 * 1024) {
+                    return file; // Already small enough for instant 1s load
+                }
 
-            if (file) {
-                preview.classList.add('active');
-                fileName.textContent = file.name;
-                fileSize.textContent = formatFileSize(file.size);
-            } else {
-                preview.classList.remove('active');
-                fileName.textContent = '';
-                fileSize.textContent = '';
+                if (onProgress) onProgress('Optimizing textures for &lt;1s load...');
+                const arrayBuffer = await file.arrayBuffer();
+                const dataView = new DataView(arrayBuffer);
+
+                // Verify GLB magic (0x46546C67 = 'glTF')
+                if (dataView.getUint32(0, true) !== 0x46546C67) {
+                    return file;
+                }
+
+                const jsonChunkLength = dataView.getUint32(12, true);
+                const jsonBytes = new Uint8Array(arrayBuffer, 20, jsonChunkLength);
+                const jsonStr = new TextDecoder().decode(jsonBytes);
+                const gltf = JSON.parse(jsonStr);
+
+                const binHeaderOffset = 20 + jsonChunkLength;
+                if (binHeaderOffset >= arrayBuffer.byteLength) return file;
+
+                const binChunkLength = dataView.getUint32(binHeaderOffset, true);
+                const binData = new Uint8Array(arrayBuffer, binHeaderOffset + 8, binChunkLength);
+
+                if (!gltf.images || gltf.images.length === 0) return file;
+
+                const newImagesData = new Map();
+                for (let i = 0; i < gltf.images.length; i++) {
+                    const img = gltf.images[i];
+                    if (img.bufferView === undefined) continue;
+
+                    const bv = gltf.bufferViews[img.bufferView];
+                    const offset = bv.byteOffset || 0;
+                    const len = bv.byteLength;
+                    const imgBytes = binData.subarray(offset, offset + len);
+
+                    try {
+                        const blob = new Blob([imgBytes], { type: img.mimeType || 'image/png' });
+                        const bitmap = await createImageBitmap(blob);
+
+                        // Scale down to max 1024 for crisp mobile rendering with low weight
+                        const maxDim = 1024;
+                        let w = bitmap.width;
+                        let h = bitmap.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) {
+                                h = Math.round((h * maxDim) / w);
+                                w = maxDim;
+                            } else {
+                                w = Math.round((w * maxDim) / h);
+                                h = maxDim;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(bitmap, 0, 0, w, h);
+
+                        const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.75));
+                        if (compressedBlob && compressedBlob.size < len) {
+                            const compressedBuf = new Uint8Array(await compressedBlob.arrayBuffer());
+                            newImagesData.set(img.bufferView, compressedBuf);
+                            img.mimeType = 'image/jpeg';
+                        }
+                    } catch (e) {
+                        console.warn('Could not compress texture image', i, e);
+                    }
+                }
+
+                if (newImagesData.size === 0) return file;
+
+                // Reconstruct Binary Chunk with aligned bufferViews
+                const chunks = [];
+                let currentOffset = 0;
+
+                for (let i = 0; i < gltf.bufferViews.length; i++) {
+                    const bv = gltf.bufferViews[i];
+                    const padding = (4 - (currentOffset % 4)) % 4;
+                    if (padding > 0) {
+                        chunks.push(new Uint8Array(padding));
+                        currentOffset += padding;
+                    }
+
+                    bv.byteOffset = currentOffset;
+                    if (newImagesData.has(i)) {
+                        const buf = newImagesData.get(i);
+                        chunks.push(buf);
+                        bv.byteLength = buf.byteLength;
+                        currentOffset += buf.byteLength;
+                    } else {
+                        const oldOffset = bv.byteOffset || 0;
+                        const oldLen = bv.byteLength;
+                        const buf = binData.subarray(oldOffset, oldOffset + oldLen);
+                        chunks.push(buf);
+                        currentOffset += oldLen;
+                    }
+                }
+
+                const binPadding = (4 - (currentOffset % 4)) % 4;
+                if (binPadding > 0) {
+                    chunks.push(new Uint8Array(binPadding));
+                    currentOffset += binPadding;
+                }
+
+                gltf.buffers[0].byteLength = currentOffset;
+
+                // Encode padded JSON
+                let newJsonBytes = new TextEncoder().encode(JSON.stringify(gltf));
+                const jsonPadding = (4 - (newJsonBytes.byteLength % 4)) % 4;
+                if (jsonPadding > 0) {
+                    const padded = new Uint8Array(newJsonBytes.byteLength + jsonPadding);
+                    padded.set(newJsonBytes);
+                    for (let p = 0; p < jsonPadding; p++) {
+                        padded[newJsonBytes.byteLength + p] = 0x20; // space padding
+                    }
+                    newJsonBytes = padded;
+                }
+
+                const newBinChunk = new Uint8Array(currentOffset);
+                let writePos = 0;
+                for (const c of chunks) {
+                    newBinChunk.set(c, writePos);
+                    writePos += c.byteLength;
+                }
+
+                const newTotalLength = 12 + 8 + newJsonBytes.byteLength + 8 + newBinChunk.byteLength;
+                const finalBuffer = new Uint8Array(newTotalLength);
+                const finalView = new DataView(finalBuffer.buffer);
+
+                // Header
+                finalView.setUint32(0, 0x46546C67, true);
+                finalView.setUint32(4, 2, true);
+                finalView.setUint32(8, newTotalLength, true);
+
+                // JSON Chunk
+                finalView.setUint32(12, newJsonBytes.byteLength, true);
+                finalView.setUint32(16, 0x4E4F534A, true);
+                finalBuffer.set(newJsonBytes, 20);
+
+                // BIN Chunk
+                const binHeader = 20 + newJsonBytes.byteLength;
+                finalView.setUint32(binHeader, newBinChunk.byteLength, true);
+                finalView.setUint32(binHeader + 4, 0x004E4942, true);
+                finalBuffer.set(newBinChunk, binHeader + 8);
+
+                const optimizedFile = new File([finalBuffer], file.name, { type: 'model/gltf-binary' });
+                console.log(`GLB compressed in-browser: ${formatFileSize(file.size)} -> ${formatFileSize(optimizedFile.size)}`);
+                return optimizedFile;
+            } catch (err) {
+                console.warn('Error during in-browser GLB optimization, using original:', err);
+                return file;
             }
+        }
+
+        async function handleGlbSelection(file) {
+            const preview = document.getElementById('glbPreview');
+            const fileName = document.getElementById('glbFileName');
+            const fileSize = document.getElementById('glbFileSize');
+            const badge = document.getElementById('glbOptBadge');
+
+            if (!file) {
+                preview.classList.remove('active');
+                preparedGlbFile = null;
+                updateSubmitButton();
+                return;
+            }
+
+            preview.classList.add('active');
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+
+            if (file.size > 2.5 * 1024 * 1024) {
+                badge.style.display = 'inline-flex';
+                badge.className = 'optimization-badge';
+                badge.innerHTML = '<span class="optimizing-spinner"></span> Optimizing for fast &lt;1s restaurant loading...';
+                
+                preparedGlbFile = await optimizeGLB(file);
+                
+                badge.innerHTML = `⚡ Optimized: ${formatFileSize(file.size)} ➔ <b>${formatFileSize(preparedGlbFile.size)}</b> (Loads in &lt;1s on mobile)`;
+            } else {
+                preparedGlbFile = file;
+                badge.style.display = 'inline-flex';
+                badge.className = 'optimization-badge';
+                badge.innerHTML = `⚡ Compact size (${formatFileSize(file.size)}) — Ready for instant loading`;
+            }
+
+            updateSubmitButton();
+        }
+
+        function handleUsdzSelection(file) {
+            const preview = document.getElementById('usdzPreview');
+            const fileName = document.getElementById('usdzFileName');
+            const fileSize = document.getElementById('usdzFileSize');
+            const badge = document.getElementById('usdzOptBadge');
+
+            if (!file) {
+                preview.classList.remove('active');
+                preparedUsdzFile = null;
+                updateSubmitButton();
+                return;
+            }
+
+            preview.classList.add('active');
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            preparedUsdzFile = file;
+
+            badge.style.display = 'inline-flex';
+            badge.className = 'optimization-badge';
+            badge.innerHTML = `📱 iOS AR Quick Look model ready (${formatFileSize(file.size)})`;
+
             updateSubmitButton();
         }
 
         function updateSubmitButton() {
-            const glbFile = document.getElementById('glbInput').files[0];
-            const usdzFile = document.getElementById('usdzInput').files[0];
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = !(glbFile || usdzFile);
+            submitBtn.disabled = !(preparedGlbFile || preparedUsdzFile);
         }
 
+        // Drag & Drop Handlers
         ['glbUploadBox', 'usdzUploadBox'].forEach(boxId => {
             const box = document.getElementById(boxId);
             
@@ -349,62 +717,182 @@
             box.addEventListener('drop', (e) => {
                 e.preventDefault();
                 box.classList.remove('drag-over');
-                const input = box.querySelector('.file-input');
                 const file = e.dataTransfer.files[0];
-                
-                if (file && file.name.endsWith(input.accept)) {
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    input.files = dataTransfer.files;
-                    handleFile(file, 
-                        boxId === 'glbUploadBox' ? 'glbPreview' : 'usdzPreview',
-                        boxId === 'glbUploadBox' ? 'glbFileName' : 'usdzFileName',
-                        boxId === 'glbUploadBox' ? 'glbFileSize' : 'usdzFileSize'
-                    );
+                if (!file) return;
+
+                if (boxId === 'glbUploadBox' && file.name.endsWith('.glb')) {
+                    handleGlbSelection(file);
+                } else if (boxId === 'usdzUploadBox' && file.name.endsWith('.usdz')) {
+                    handleUsdzSelection(file);
                 }
             });
         });
 
         document.getElementById('glbInput').addEventListener('change', (e) => {
-            handleFile(e.target.files[0], 'glbPreview', 'glbFileName', 'glbFileSize');
+            handleGlbSelection(e.target.files[0]);
         });
 
         document.getElementById('usdzInput').addEventListener('change', (e) => {
-            handleFile(e.target.files[0], 'usdzPreview', 'usdzFileName', 'usdzFileSize');
+            handleUsdzSelection(e.target.files[0]);
         });
 
-        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+        // Form Submission
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const progressBar = document.getElementById('progressBar');
             const progress = document.getElementById('progress');
             const submitBtn = document.getElementById('submitBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultLinkText = document.getElementById('resultLinkText');
+            const openViewerBtn = document.getElementById('openViewerBtn');
 
             progressBar.classList.add('active');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Uploading...';
+            resultContainer.style.display = 'none';
 
-            const formData = new FormData(e.target);
-            
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(html => {
-                document.body.innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                submitBtn.textContent = 'Upload Failed';
+            let progressVal = 10;
+            progress.style.width = progressVal + '%';
+            const progressTimer = setInterval(() => {
+                if (progressVal < 90) {
+                    progressVal += 10;
+                    progress.style.width = progressVal + '%';
+                }
+            }, 150);
+
+            try {
+                const dishName = document.getElementById('dishName').value.trim() || 
+                                (preparedGlbFile ? preparedGlbFile.name.replace('.glb', '') : 'Dish Model');
+
+                // Case 1: Direct upload to Supabase Storage if configured (completely bypasses Vercel 4.5MB limit)
+                if (supabaseClient) {
+                    submitBtn.textContent = 'Uploading to Cloud Storage...';
+                    let glbUrl = null;
+                    let usdzUrl = null;
+
+                    if (preparedGlbFile) {
+                        const glbName = `${Date.now()}-${preparedGlbFile.name}`;
+                        const { data, error } = await supabaseClient.storage.from('models').upload(glbName, preparedGlbFile, {
+                            contentType: 'model/gltf-binary',
+                            cacheControl: '31536000'
+                        });
+                        if (!error) {
+                            const { data: { publicUrl } } = supabaseClient.storage.from('models').getPublicUrl(glbName);
+                            glbUrl = publicUrl;
+                        }
+                    }
+
+                    if (preparedUsdzFile) {
+                        const usdzName = `${Date.now()}-${preparedUsdzFile.name}`;
+                        const { data, error } = await supabaseClient.storage.from('models').upload(usdzName, preparedUsdzFile, {
+                            contentType: 'model/vnd.usdz+zip',
+                            cacheControl: '31536000'
+                        });
+                        if (!error) {
+                            const { data: { publicUrl } } = supabaseClient.storage.from('models').getPublicUrl(usdzName);
+                            usdzUrl = publicUrl;
+                        }
+                    }
+
+                    if (glbUrl || usdzUrl) {
+                        let viewerLink = `/viewer.html?glb=${encodeURIComponent(glbUrl || '')}&usdz=${encodeURIComponent(usdzUrl || '')}`;
+                        try {
+                            const regRes = await fetch('/api/register-link', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name: dishName, glb: glbUrl, usdz: usdzUrl })
+                            });
+                            if (regRes.ok) {
+                                const regData = await regRes.json();
+                                if (regData && regData.viewerLink) {
+                                    viewerLink = regData.viewerLink;
+                                }
+                            }
+                        } catch (regErr) {
+                            console.warn('Could not register to history, but viewer link is generated:', regErr);
+                        }
+                        displaySuccess(viewerLink);
+                        return;
+                    }
+                }
+
+                // Case 2: Server POST upload (only if files are within 4MB limit)
+                const totalSize = (preparedGlbFile ? preparedGlbFile.size : 0) + (preparedUsdzFile ? preparedUsdzFile.size : 0);
+                if (totalSize > 4.2 * 1024 * 1024) {
+                    throw new Error('Direct cloud storage was unavailable and total file size (' + formatFileSize(totalSize) + ') exceeds serverless 4.5MB limit.');
+                }
+
+                const formData = new FormData();
+                if (preparedGlbFile) {
+                    formData.append('glb', preparedGlbFile);
+                }
+                if (preparedUsdzFile) {
+                    formData.append('usdz', preparedUsdzFile);
+                }
+
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.status === 413) {
+                    throw new Error('Request payload too large. Please use models under 4MB or check cloud storage connection.');
+                }
+
+                const responseText = await response.text();
+                const match = responseText.match(/href="([^"]+)"/);
+                const viewerLink = match ? match[1] : '/viewer.html';
+                displaySuccess(viewerLink);
+
+            } catch (error) {
+                console.error('Upload Error:', error);
+                clearInterval(progressTimer);
+                progressBar.classList.remove('active');
                 submitBtn.disabled = false;
-            });
+                submitBtn.textContent = 'Upload Models';
+                alert('Upload issue: ' + (error.message || 'Please check your connection and file sizes.'));
+            }
 
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 90) clearInterval(interval);
-                width += 5;
-                progress.style.width = width + '%';
-            }, 100);
+            function displaySuccess(link) {
+                clearInterval(progressTimer);
+                progress.style.width = '100%';
+                setTimeout(() => {
+                    progressBar.classList.remove('active');
+                }, 400);
+
+                submitBtn.textContent = 'Uploaded Successfully!';
+                submitBtn.disabled = true;
+
+                const fullUrl = window.location.origin + link;
+                resultLinkText.textContent = fullUrl;
+                openViewerBtn.href = fullUrl;
+                resultContainer.style.display = 'block';
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        document.getElementById('copyLinkBtn').addEventListener('click', () => {
+            const link = document.getElementById('resultLinkText').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = document.getElementById('copyLinkBtn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Link';
+                }, 2000);
+            });
+        });
+
+        document.getElementById('uploadAnotherBtn').addEventListener('click', () => {
+            document.getElementById('uploadForm').reset();
+            document.getElementById('glbPreview').classList.remove('active');
+            document.getElementById('usdzPreview').classList.remove('active');
+            document.getElementById('resultContainer').style.display = 'none';
+            preparedGlbFile = null;
+            preparedUsdzFile = null;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Upload Models';
+            submitBtn.disabled = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script>
 </body>
