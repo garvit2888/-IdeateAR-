@@ -14,7 +14,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="./style.css" />
     <!-- Preload 3D Model & Poster for < 1s load in low network / restaurant environments -->
-    <link rel="preload" href="./pizza.glb" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="./pizza.glb?v=2" as="fetch" crossorigin="anonymous" />
     <link rel="preload" href="./pizza-poster.jpg" as="image" />
     <!-- Model Viewer for AR/3D -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
@@ -64,7 +64,7 @@
                 For the 3D model to be visible on desktop browsers (Chrome, Edge, Safari on Mac) 
                 or Android devices, you MUST also provide a .glb version.
                 -->
-                <model-viewer id="hero-model" class="pizza-model" src="./pizza.glb" ios-src="./pizza.usdz" alt="A 3D model of a pizza"
+                <model-viewer id="hero-model" class="pizza-model" src="./pizza.glb?v=2" ios-src="./pizza.usdz?v=2" alt="A 3D model of a pizza"
                     poster="./pizza-poster.jpg" seamless-poster loading="eager" reveal="auto"
                     auto-rotate rotation-per-second="30deg" camera-controls camera-orbit="0deg 45deg 105%" ar
                     shadow-intensity="1">
