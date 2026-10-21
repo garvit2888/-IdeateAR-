@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload 3D Food Model - IdeateAR Admin</title>
+    <title>Upload 3D Food Model - PlateAR Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -510,7 +510,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <img src="/logo.png" alt="IdeateAR" class="logo" onclick="window.location.href='/'">
+    <img src="/logo.png" alt="PlateAR" class="logo" onclick="window.location.href='/'">
     
     <div class="container">
         <div class="header">
@@ -678,7 +678,7 @@
 
         function getStoredRestaurants() {
             try {
-                return JSON.parse(localStorage.getItem('ideatear_restaurants') || '[]');
+                return JSON.parse(localStorage.getItem('platear_restaurants') || localStorage.getItem('ideatear_restaurants') || '[]');
             } catch (e) {
                 return [];
             }
@@ -688,7 +688,7 @@
             const list = getStoredRestaurants();
             if (!list.some(r => r.toLowerCase() === name.toLowerCase())) {
                 list.push(name);
-                localStorage.setItem('ideatear_restaurants', JSON.stringify(list));
+                localStorage.setItem('platear_restaurants', JSON.stringify(list));
             }
         }
 
@@ -1181,7 +1181,7 @@
 
                 // Cache newly uploaded dish into browser localStorage for instant history sync
                 try {
-                    const localLinks = JSON.parse(localStorage.getItem('ideatear_links') || '[]');
+                    const localLinks = JSON.parse(localStorage.getItem('platear_links') || localStorage.getItem('ideatear_links') || '[]');
                     const filtered = localLinks.filter(l => l.viewerLink !== link);
                     filtered.unshift({
                         id: Date.now().toString(),
@@ -1192,7 +1192,7 @@
                         viewerLink: link,
                         createdAt: new Date().toISOString()
                     });
-                    localStorage.setItem('ideatear_links', JSON.stringify(filtered));
+                    localStorage.setItem('platear_links', JSON.stringify(filtered));
                     saveStoredRestaurant(restName);
                 } catch (e) {}
 

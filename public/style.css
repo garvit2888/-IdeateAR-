@@ -953,7 +953,7 @@ h6,
 
 /* Mobile responsive sizing for the home page */
 @media (max-width: 600px) {
-  /* Prevent IDEATEAR from wrapping, keep it left-aligned */
+  /* Prevent PLATEAR from wrapping, keep it left-aligned */
   .impactful-heading {
     font-size: clamp(2.4rem, 12vw, 3.8rem) !important; /* gorgeous standard size on mobile */
     white-space: nowrap !important;

@@ -1,5 +1,5 @@
 {
-    "name": "ideatear-webar",
+    "name": "platear-webar",
     "version": "1.0.0",
     "description": "WebAR 3D model hosting platform",
     "main": "server.js",

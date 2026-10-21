@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Food Model Archive - IdeateAR Admin</title>
+    <title>AR Food Model Archive - PlateAR Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -692,7 +692,7 @@
     </style>
 </head>
 <body>
-    <img src="/logo.png" alt="IdeateAR" class="logo" onclick="window.location.href='/'">
+    <img src="/logo.png" alt="PlateAR" class="logo" onclick="window.location.href='/'">
     
     <div class="container">
         <!-- Header -->
@@ -844,7 +844,7 @@
         // Local storage helpers for restaurants (synchronized with upload.html)
         function getStoredRestaurants() {
             try {
-                return JSON.parse(localStorage.getItem('ideatear_restaurants') || '[]');
+                return JSON.parse(localStorage.getItem('platear_restaurants') || localStorage.getItem('ideatear_restaurants') || '[]');
             } catch (e) {
                 return [];
             }
@@ -854,7 +854,7 @@
             const list = getStoredRestaurants();
             if (!list.some(r => r.toLowerCase() === name.toLowerCase())) {
                 list.push(name);
-                localStorage.setItem('ideatear_restaurants', JSON.stringify(list));
+                localStorage.setItem('platear_restaurants', JSON.stringify(list));
             }
         }
 
@@ -1138,7 +1138,7 @@
 
         function getLocalLinks() {
             try {
-                return JSON.parse(localStorage.getItem('ideatear_links') || '[]');
+                return JSON.parse(localStorage.getItem('platear_links') || localStorage.getItem('ideatear_links') || '[]');
             } catch (e) {
                 return [];
             }
